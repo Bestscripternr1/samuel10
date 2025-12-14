@@ -8,18 +8,18 @@ local Camera = workspace.CurrentCamera
 
 -- Fenster erstellen
 local Window = OrionLib:MakeWindow({
-    Name = "│Samuel v2.0 │〄Emergency Hamburg",
+    Name = "│Samuel v10.1 │〄Emergency Hamburg",
     SaveConfig = false,
-    IntroText = "Samuel's Ultimate Script"
+    IntroText = "SamuelBeste"
 })
 local Tab = Window:MakeTab({
-    Name = "⭐│Credits",
+    Name = "😎│Credits",
 })
 
 Tab:AddParagraph("© 2025   Samuel Scripting", "")
 
 Tab:AddButton({
-    Name = "Copy Discord Link",
+    Name = "Copying Discord Link",
     Callback = function()
         setclipboard("https://discord.gg/MNEv7h9yWU")
         OrionLib:MakeNotification({
@@ -34,20 +34,20 @@ Tab:AddButton({
 
 --- Player Tab
 local Tab1 = Window:MakeTab({
-    Name = "👤│Player",
+    Name = "⚙│Player",
     PremiumOnly = false
 })
 
 -- Kategorie / Section 1
 Tab1:AddSection({
-    Name = "Player Controls"
+    Name = "Player"
 })
 
 local mouse = game.Players.LocalPlayer:GetMouse()
 local destroyEnabled = false
 
 Tab1:AddToggle({
-    Name = "🔘 Click to Delete",
+    Name = "⚫ Click to Delete",
     Default = false,
     Callback = function(v) destroyEnabled = v end
 })
@@ -67,7 +67,7 @@ local function noclip(enable)
 end
 
 Tab1:AddToggle({
-    Name = "🔘 Noclip",
+    Name = "⚫ Noclip",
     Default = false,
     Callback = function(v)
         noclipEnabled = v
@@ -183,7 +183,7 @@ end
 
 -- Fly Toggle unter Noclip Toggle
 Tab1:AddToggle({
-    Name = "🔘 Player Fly",
+    Name = "⚫ Player Fly",
     Default = false,
     Callback = function(Value)
         local success = ToggleFlight(Value)
@@ -231,7 +231,7 @@ function AntiFallFunction(Value)
 end
 
 Tab1:AddToggle({
-    Name = "🔘 Anti-Fall/Damage",
+    Name = "⚫ Anti-Fall/Damage",
     Default = false,
     Callback = function(Value)
         AntiFallFunction(Value)
@@ -303,14 +303,14 @@ local function setupAntiTaserForCharacter(char)
 end
 
 
--- Kategorie / Section 2
+-- Kategorie / Section 1
 Tab1:AddSection({
-    Name = "Taser Features"
+    Name = "Taser"
 })
 
 -- Toggle im UI
 Tab1:AddToggle({
-    Name = "🔘 Anti-Taser",
+    Name = "⚫ Anti-Taser",
     Default = false,
     Callback = function(Value)
         AntiTaserEnabled = Value
@@ -428,7 +428,7 @@ RunService.RenderStepped:Connect(function()
 end)
 
 Tab1:AddToggle({
-    Name = "🔘 Auto Taser",
+    Name = "⚫ Auto Taser",
     Default = false,
     Callback = function(Value)
         autoEnabled = Value
@@ -447,7 +447,9 @@ Tab1:AddToggle({
         end
     end
 })
+--------------------------------------------------------
 
+----------------------------------------------------------------------
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
@@ -476,18 +478,20 @@ player.CharacterAdded:Connect(function()
 end)
 
 
+
+
 local button = script.Parent
-local player = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer -- Oyuncu
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
--- Kategorie / Section 3
+-- Kategorie / Section 1
 Tab1:AddSection({
-    Name = "Extra Features"
+    Name = "Extra"
 })
 
 Tab1:AddButton({
-    Name = "🔘 Jump from Vehicle/Seat",
+    Name = "⚫ Jump from Vehicle/Seat",
     Callback = function()
         if humanoid then
             humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -496,7 +500,7 @@ Tab1:AddButton({
 })
 
 Tab1:AddButton({
-	Name = "🔘 Reset Character",
+	Name = "⚫ Reset Character",
 	Callback = function()
 		local player = game.Players.LocalPlayer
 		local character = player.Character or player.CharacterAdded:Wait()
@@ -525,7 +529,7 @@ local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 local jumpBoostPower = 350
 
 Tab1:AddSlider({
-    Name = "🔘 Jump Power",
+    Name = "⚫ Jump Power",
     Min = 0,
     Max = 350,
     Default = 0,
@@ -555,13 +559,13 @@ if Players.LocalPlayer.Character then
 end
 
 local Tab2 = Window:MakeTab({
-	Name = "🚗│Vehicle",
+	Name = "🛺│Car Fly",
 	PremiumOnly = false
 })
 
 -- Kategorie / Section 1
 Tab2:AddSection({
-    Name = "Vehicle Flight"
+    Name = "Fly"
 })
 
 local player = game.Players.LocalPlayer
@@ -587,6 +591,9 @@ local function teleportToVehicle()
 		end
 	end
 end
+
+--------------------------------------------------------
+
 
 local flightGuiEnabled = false
 local flightEnabled = false
@@ -676,7 +683,7 @@ local UserInputService = game:GetService("UserInputService")
 
 
 Tab2:AddToggle({
-    Name = "🟩 Car Flight",
+    Name = "🟢 Car Fly (Nicht Hoch Fligen)",
     Default = false,
     Callback = function(Value)
         flightEnabled = Value
@@ -684,7 +691,7 @@ Tab2:AddToggle({
 })
 
 Tab2:AddToggle({
-    Name = "🟩 Mobile Flight Menu",
+    Name = "🟢 Mobile Fly Menu",
     Default = false,
     Callback = function(Value)
         toggleFlightGui(Value)
@@ -733,7 +740,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end)
 
 Tab2:AddBind({
-    Name = "🟩 Flight Keybind",
+    Name = "🟢 Car fly Keybind",
     Default = Enum.KeyCode.X,
     Hold = false,
     Callback = function()
@@ -1029,16 +1036,49 @@ local function startRainbow()
 	end)
 end
 
--- Kategorie / Section 2
+
+
+-- defensive checks + Debug helper
+local function safePrint(...)
+    if typeof(print) == "function" then
+        print("[CarMod] ", ...)
+    end
+end
+
+local function safeCall(fn, ...)
+    if type(fn) ~= "function" then
+        safePrint("safeCall: versucht non-function aufzurufen")
+        return false
+    end
+    local ok, res = pcall(fn, ...)
+    if not ok then
+        safePrint("Fehler in safeCall:", res)
+    end
+    return ok, res
+end
+
+-- check Window
+if typeof(Window) ~= "table" and typeof(Window) ~= "userdata" then
+    safePrint("Fehler: 'Window' ist nil oder nicht vorhanden. Make sure the UI library is loaded.")
+    return
+end
+
+-- Kategorie / Section 1
 Tab2:AddSection({
-    Name = "Vehicle Mods"
+    Name = "Exsta"
 })
 
+
+local lplr = game:GetService("Players").LocalPlayer
+
+local lplr = game:GetService("Players").LocalPlayer
+
 Tab2:AddButton({
-	Name = "🟩 Vehicle God Mode",
+	Name = "🟢 CarGod",
 	Callback = function()
         local vehicleGodMode = true  
         local lastVehicle = nil
+        
         
         local function updateVehicle()
             if not vehicleGodMode then return end
@@ -1059,14 +1099,14 @@ Tab2:AddButton({
 })
 
 Tab2:AddButton({
-	Name = "🟩 Enter Vehicle",
+	Name = "🟢 Stel my Vehicle",
 	Callback = function()
 		ensurePlayerInVehicle()
   	end    
 })
 
 Tab2:AddToggle({
-	Name = "🟩 Rainbow Vehicle Color",
+	Name = "🟢 🌈 Rainbow Fahrzeugfarbe",
 	Default = true,
 	Callback = function(Value)
 		rainbowAktiv = Value
@@ -1078,7 +1118,7 @@ Tab2:AddToggle({
 	end
 })
 
--- Kategorie / Section 3
+-- Kategorie / Section 1
 Tab2:AddSection({
     Name = "Speed Boost"
 })
@@ -1127,7 +1167,7 @@ local function startBoostEnforcer()
         pcall(function()
             hrp.AssemblyLinearVelocity = desired
         end)
-    end
+    end)
 end
 
 local function stopBoostEnforcer()
@@ -1198,7 +1238,7 @@ player.CharacterAdded:Connect(function()
 end)
 
 Tab2:AddToggle({
-    Name = "🟩 Speed Boost (Safe Mode)",
+    Name = "🟢 Speed Boost (Safe Mode)",
     Default = false,
     Callback = function(Value)
         enableSafeSpeedBoost(Value)
@@ -1221,7 +1261,7 @@ Tab2:AddToggle({
 })
 
 Tab2:AddSlider({
-    Name = "🟩 Boost Speed",
+    Name = "🟢 Boost Speed",
     Min = 0,
     Max = 300,
     Default = speedValue,
@@ -1241,7 +1281,7 @@ Tab2:AddSlider({
 
 
 Tab2:AddSlider({ 
-    Name = "🟩 Flight Speed", 
+    Name = "🟢 Car Fly Speed //over 70 for a not god PC", 
     Min = 10,
     Max = 450, 
     Default = (flightSpeed * 60),
@@ -1255,7 +1295,7 @@ Tab2:AddSlider({
 
 
 local Tab3 = Window:MakeTab({
-	Name = "📍│Teleport",
+	Name = "🌀│Teleport",
 	PremiumOnly = false
 })
 
@@ -1443,7 +1483,7 @@ function frameTween(targetCFrame)
 		if humanoid.SeatPart ~= driveSeat then
 			driveSeat:Sit(humanoid)
 			task.wait(0.1)
-	 end
+		end
 	end
 
 	-- Sabit yükseklik belirle
@@ -1624,7 +1664,7 @@ Tab3:AddButton({
 
 -- OrionLib Button: Teleport to fixed coords (player + vehicle)
 Tab3:AddButton({
-    Name = "🔵 Bank Robbery (OP)",
+    Name = "🔵 Robbery Bank (OP)",
     Callback = function()
         local targetPos = Vector3.new(-1198.692993, 7.977509, 3161.447754)
         local targetCFrame = CFrame.new(targetPos)
@@ -1688,7 +1728,7 @@ local player = game.Players.LocalPlayer
 local flightSpeed = 190 -- Langsamer machen (z. B. 20 statt 60)
 
 Tab3:AddDropdown({
-    Name = "🔵 Normal Locations",
+    Name = "🔵 Normal Places",
     Default = "1",
     Options = {"Prison Out", "Prison In","Police","Tuning Garage", "Hospital", "Tuner", "Dealership", "Fire Station", "Smuggler (near clothing store)", "Truck Company", "Bus Company"},
     Callback = function(Value)
@@ -1704,7 +1744,7 @@ Tab3:AddDropdown({
             ["Tuner"] = CFrame.new(-1438.34705, 5.35521317, 171.125198, 0.0264777429, 0.0146148987, 0.999542534, -0.0202042889, 0.999696672, -0.0140819438, -0.9994452, -0.0198221896, 0.0267649963),
             ["Bus Company"] = CFrame.new(-1682.2969970703125, 8.779464721679688, -1273.07763671875),
             ["Hospital"] = CFrame.new(-278.833740234375, 7.7454142570495605, 1085.7965087890625),
-            ["Police Station"] = CFrame.new(-1702.70166015625, 4.607900142669678, 2723.564697265625),
+            ["Polica Station"] = CFrame.new(-1702.70166015625, 4.607900142669678, 2723.564697265625),
             ["Dealership"] = CFrame.new(-1415.6986083984375, 4.552238464355469, 940.5262451171875),
         }
 
@@ -1719,7 +1759,7 @@ Tab3:AddDropdown({
 })
 
 Tab3:AddDropdown({
-    Name = "🔵 Robbery Locations",
+    Name = "🔵 Robbery Places",
     Default = "1",
     Options = {"Bank", "Jewellery", "Erwin Club", "Gas-N-Go Fuel", "Ares Fuel", "Tool Shop", "Farm Shop", "Osso Fuel", "Container Ship", "Clothing Store"},
     Callback = function(Value)
@@ -1747,7 +1787,7 @@ Tab3:AddDropdown({
 })
 
 local Tab4 = Window:MakeTab({
-	Name = "👁️│ESP",
+	Name = "👁️│Esp",
 	PremiumOnly = false
 })
 
@@ -1779,7 +1819,7 @@ local function SetESPSize(value)
 end
 
 Tab4:AddToggle({
-	Name = "🔵 HealthBar ESP",
+	Name = "⚪ HealthBar ESP",
 	Default = false,
 	Callback = function(Value)
 		ESPEnabled = Value
@@ -1881,7 +1921,7 @@ local ESPEnabled = false
 local UseTeamColor = false
 
 Tab4:AddToggle({
-    Name = "🔵 Box ESP",
+    Name = "⚪ Box ESP",
     Default = false,
     Callback = function(Value)
         ESPEnabled = Value
@@ -1899,7 +1939,7 @@ Tab4:AddToggle({
 })
 
 Tab4:AddToggle({
-    Name = "🔵 Use Team Colors",
+    Name = "⚪ Use Team Colors",
     Default = false,
     Callback = function(Value)
         UseTeamColor = Value
@@ -1998,6 +2038,98 @@ Players.PlayerAdded:Connect(function(player)
     end
 end)
 
+
+--------------------------------------------------------------------------------
+-- KODUN SONU
+--------------------------------------------------------------------------------
+-- 1) AIMBOT TAB VE SECTION
+--------------------------------------------------------------------------------
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local AimFOV = 42
+local smoothing = 0.5  
+local maxTargetDistance = 500 
+local predictionFactor = 0.0575 
+local predictToggle = false
+local lockPart = "HumanoidRootPart" 
+local aimbotEnabled = false  
+local fovCircleEnabled = false  
+local fovColor = Color3.fromRGB(255, 255, 255)  
+
+local function removeMobileGui()
+    if aimbotGui then
+        aimbotGui:Destroy()
+        aimbotGui = nil
+        aimbotButton = nil
+    end
+end
+
+local function createMobileGui()
+    if aimbotGui then return fovCircleEnabled end
+
+    aimbotGui = Instance.new("ScreenGui")
+    aimbotGui.Name = "MobileAimbotGui"
+    aimbotGui.Parent = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+
+    aimbotButton = Instance.new("TextButton")
+    aimbotButton.Size = UDim2.new(0, 200, 0, 50)
+    aimbotButton.Position = UDim2.new(0.5, -100, 0.8, 0)
+    aimbotButton.Text = "Aimbot: OFF"
+    aimbotButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) 
+    aimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255) 
+    aimbotButton.Font = Enum.Font.SourceSans
+    aimbotButton.TextSize = 24
+    aimbotButton.Parent = aimbotGui
+
+    Instance.new("UICorner", aimbotButton)
+
+    aimbotButton.MouseButton1Click:Connect(function()
+        aimbotEnabled = not aimbotEnabled  -- Aimbot değişkenini değiştir
+
+        if aimbotEnabled then
+            aimbotButton.Text = "Aimbot: ON"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) 
+        else
+            aimbotButton.Text = "Aimbot: OFF"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) 
+        end
+    end)
+
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    aimbotButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = aimbotButton.Position
+        end
+    end)
+
+    aimbotButton.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            aimbotButton.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    aimbotButton.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+end
+
 -- Function to add Wanted label
 local function addWantedLabel(player)
     if player == LocalPlayer then return end
@@ -2065,7 +2197,7 @@ end
 
 -- Add Wanted ESP Toggle
 Tab4:AddToggle({
-    Name = "🔵 Crime ESP",
+    Name = "⚪ Crime ESP",
     Default = false,
     Callback = function(Value)
         WantedESPEnabled = Value
@@ -2111,7 +2243,7 @@ end)
 
 
 local AimbotTab = Window:MakeTab({
-    Name = "🎯│Aimbot",
+    Name = "🔴│Aimbot",
     PremiumOnly = false
 })  
  
@@ -2142,7 +2274,7 @@ AimbotTab:AddBind({
 })
  
 AimbotTab:AddDropdown({
-    Name = "🔴 Aim Part",
+    Name = "🔴 Shot",
     Default = "Head",  
     Options = {"Head", "Body"},  
     Callback = function(value)
@@ -2225,12 +2357,19 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
-local PoliceTab = Window:MakeTab({
-    Name = "👮│Police",
+local Tab = Window:MakeTab({
+    Name = "👮🏿│Police",
     PremiumOnly = false
 })
 
-PoliceTab:AddParagraph("Radar Farm","Earn money safely with no ban risk")
+--[[
+Name = <string> - The name of the tab.
+Icon = <string> - The icon of the tab.
+PremiumOnly = <bool> - Makes the tab accessible to Sirus Premium users only.
+]]
+
+
+Tab:AddParagraph("RadarFarm","You can make with it big money no ban chance")
 
 
 local rs = game:GetService("ReplicatedStorage")
@@ -2242,12 +2381,12 @@ _G.RadarFarmEnabled = false
 local function startRadarFarm()
   local remote = rs.Bnl:FindFirstChild("bbb7c252-304d-4582-b2a0-89eb9d3a0855")
   if not remote then
-    print("Remote not found")
+    print("wda")
     return
   end
 
   _G.RadarFarmEnabled = true
-  print("Radar Farm started")
+  print("Radar Farm startet")
 
   while _G.RadarFarmEnabled do
     local radarGun = char:FindFirstChild("Radar Gun")
@@ -2273,11 +2412,13 @@ end
 
 local function stopRadarFarm()
   _G.RadarFarmEnabled = false
-  print("Radar Farm stopped")
+  print("RadarStop")
 end
 
-PoliceTab:AddToggle({
-  Name = "🟤 Radar Farm",
+
+
+Tab:AddToggle({
+  Name = "🟤 RadarFarm",
   Default = false,
   Callback = function(Value)
     if Value then
@@ -2308,7 +2449,7 @@ local function enableAntiAfk()
 end
 
 -- Toggle for Anti-AFK
-PoliceTab:AddToggle({
+Tab:AddToggle({
     Name = "🟤 Anti-AFK",
     Default = false,
     Callback = function(Value)
@@ -2327,14 +2468,16 @@ local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local player = game.Players.LocalPlayer
 
-PoliceTab:AddDropdown({
-    Name = "🟤 Police Teleports",
+local flightSpeed = 190 -- Langsamer machen (z. B. 20 statt 60)
+
+Tab:AddDropdown({
+    Name = "🟤 💎│Teleports",
     Default = "1",
-    Options = {"Police Station", "Farming Spots"},
+    Options = {"Police", "Farming Places",},
     Callback = function(Value)
         local locations = {
-            ["Police Station"] = CFrame.new(-1670.691528, 5.99, 2771.11),
-            ["Farming Spots"] = CFrame.new(-1148.454346, 9.49, 2805.56),
+            ["Police"] = CFrame.new(-1670.691528, 5.99, 2771.11),
+            ["Farming Places"] = CFrame.new(-1148.454346, 9.49, 2805.56),
         }
 
         local targetCFrame = locations[Value]
@@ -2347,21 +2490,21 @@ PoliceTab:AddDropdown({
     end
 })
 
-local MedicalTab = Window:MakeTab({
-    Name = "🏥│Medical",
+local Tab = Window:MakeTab({
+    Name = "💜│Selv Revive",
     PremiumOnly = false
 })
 
-MedicalTab:AddParagraph("Self-Revive System","Wait 1 minute and you will be healed (OP)")
+Tab:AddParagraph("Please wait 1m and you will be healed (OP)", "")
 
-MedicalTab:AddButton({
-    Name = "Activate Self-Revive",
+Tab:AddButton({
+    Name = "Aktiviere Self-Revive",
     Callback = function()
         -- Sicherheits-Check (nur Emergency Hamburg)
         if game.PlaceId ~= 7711635737 then
             OrionLib:MakeNotification({
-                Name = "Error",
-                Content = "This script only works in Emergency Hamburg (7711635737).",
+                Name = "Fehler",
+                Content = "Dieses Script funktioniert nur in Emergency Hamburg (7711635737).",
                 Time = 4
             })
             return
@@ -2450,8 +2593,8 @@ MedicalTab:AddButton({
 
             if not bed then
                 OrionLib:MakeNotification({
-                    Name = "Self-Revive Error",
-                    Content = "HospitalBed not found (Error 404)",
+                    Name = "Self-Revive Fehler",
+                    Content = "HospitalBed nicht gefunden (Error 404)",
                     Time = 4
                 })
                 return false
@@ -2511,7 +2654,7 @@ MedicalTab:AddButton({
             if not car then
                 OrionLib:MakeNotification({
                     Name = "Self-Revive",
-                    Content = "No vehicle found.",
+                    Content = "Kein Fahrzeug gefunden.",
                     Time = 3
                 })
                 return
@@ -2534,7 +2677,7 @@ MedicalTab:AddButton({
             else
                 OrionLib:MakeNotification({
                     Name = "Self-Revive",
-                    Content = "You are not injured - no action needed",
+                    Content = "Du bist nicht verletzt – keine Aktion nötig",
                     Time = 3
                 })
             end
@@ -2578,160 +2721,13 @@ MedicalTab:AddButton({
         enableAutoRevive(true)
 
         OrionLib:MakeNotification({
-            Name = "Self-Revive activated",
-            Content = "Auto-Revive is now running (use with caution).",
+            Name = "Self-Revive aktiviert",
+            Content = "Auto-Revive läuft jetzt (vorsichtig verwenden).",
             Time = 5
         })
     end
 })
 
--- Neue Tabs hinzufügen
-
-local CrimeTab = Window:MakeTab({
-    Name = "🦹│Crime",
-    PremiumOnly = false
-})
-
-CrimeTab:AddSection({
-    Name = "Automatic Crime"
-})
-
--- Automatische Banküberfälle
-local autoBankEnabled = false
-CrimeTab:AddToggle({
-    Name = "🟣 Auto Bank Robbery",
-    Default = false,
-    Callback = function(Value)
-        autoBankEnabled = Value
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "Auto Bank",
-                Content = "Auto bank robbery enabled!",
-                Time = 3
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Auto Bank",
-                Content = "Auto bank robbery disabled.",
-                Time = 3
-            })
-        end
-    end
-})
-
--- Autostahl
-local autoStealEnabled = false
-CrimeTab:AddToggle({
-    Name = "🟣 Auto Vehicle Theft",
-    Default = false,
-    Callback = function(Value)
-        autoStealEnabled = Value
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "Auto Theft",
-                Content = "Auto vehicle theft enabled!",
-                Time = 3
-            })
-        end
-    end
-})
-
-CrimeTab:AddButton({
-    Name = "🟣 Rob Gas Station",
-    Callback = function()
-        frameTween(CFrame.new(-1560.674, 3.944, 3813.656))
-    end
-})
-
-CrimeTab:AddButton({
-    Name = "🟣 Rob Jewellery Store",
-    Callback = function()
-        frameTween(CFrame.new(-407.536, 21.950, 3516.854))
-    end
-})
-
-CrimeTab:AddSection({
-    Name = "Money Farming"
-})
-
-local moneyFarmEnabled = false
-CrimeTab:AddToggle({
-    Name = "🟣 Auto Money Farm",
-    Default = false,
-    Callback = function(Value)
-        moneyFarmEnabled = Value
-        if Value then
-            OrionLib:MakeNotification({
-                Name = "Money Farm",
-                Content = "Money farming started!",
-                Time = 3
-            })
-        end
-    end
-})
-
-local MiscTab = Window:MakeTab({
-    Name = "⚡│Misc",
-    PremiumOnly = false
-})
-
-MiscTab:AddSection({
-    Name = "Game Settings"
-})
-
-local fpsBoostEnabled = false
-MiscTab:AddToggle({
-    Name = "⚪ FPS Boost",
-    Default = false,
-    Callback = function(Value)
-        fpsBoostEnabled = Value
-        if Value then
-            settings().Rendering.QualityLevel = 1
-            settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
-            OrionLib:MakeNotification({
-                Name = "FPS Boost",
-                Content = "FPS boost activated!",
-                Time = 3
-            })
-        end
-    end
-})
-
-MiscTab:AddButton({
-    Name = "⚪ Rejoin Server",
-    Callback = function()
-        TeleportService:Teleport(game.PlaceId)
-    end
-})
-
-MiscTab:AddButton({
-    Name = "⚪ Copy Game ID",
-    Callback = function()
-        setclipboard(tostring(game.PlaceId))
-        OrionLib:MakeNotification({
-            Name = "Game ID",
-            Content = "Game ID copied to clipboard!",
-            Time = 3
-        })
-    end
-})
-
-MiscTab:AddSection({
-    Name = "UI Settings"
-})
-
-local uiVisible = true
-MiscTab:AddButton({
-    Name = "⚪ Hide/Show UI",
-    Callback = function()
-        uiVisible = not uiVisible
-        for _, v in pairs(game.CoreGui:GetChildren()) do
-            if v:IsA("ScreenGui") and v.Name:find("Orion") then
-                v.Enabled = uiVisible
-            end
-        end
-    end
-})
 
 -- GUI starten
 OrionLib:Init()

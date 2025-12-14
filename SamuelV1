@@ -5,34 +5,49 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Camera = workspace.CurrentCamera
-local TweenService = game:GetService("TweenService")
 
 -- Professionelle Farbpalette
 local Theme = {
-    Primary = Color3.fromRGB(41, 128, 185),    -- Blau
-    Secondary = Color3.fromRGB(52, 152, 219),   -- Hellblau
-    Success = Color3.fromRGB(46, 204, 113),     -- Grün
-    Danger = Color3.fromRGB(231, 76, 60),       -- Rot
-    Warning = Color3.fromRGB(241, 196, 15),     -- Gelb
-    Dark = Color3.fromRGB(44, 62, 80),          -- Dunkelblau
-    Light = Color3.fromRGB(236, 240, 241),      -- Hellgrau
-    Purple = Color3.fromRGB(155, 89, 182),      -- Lila
-    Orange = Color3.fromRGB(230, 126, 34)       -- Orange
+    Primary = Color3.fromRGB(0, 102, 204),     -- Blau (Emergency)
+    Secondary = Color3.fromRGB(220, 20, 60),   -- Rot (Police)
+    Success = Color3.fromRGB(0, 168, 107),     -- Grün
+    Warning = Color3.fromRGB(255, 193, 7),     -- Gelb
+    Danger = Color3.fromRGB(220, 53, 69),      -- Rot (Fehler)
+    Info = Color3.fromRGB(23, 162, 184),       -- Türkis
+    Dark = Color3.fromRGB(33, 37, 41),         -- Dunkel
+    Light = Color3.fromRGB(248, 249, 250),     -- Hell
+    Purple = Color3.fromRGB(111, 66, 193),     -- Lila
+    Orange = Color3.fromRGB(253, 126, 20)      -- Orange
 }
 
--- Fenster mit professionellem Design erstellen
+-- Wasserzeichen Schutz
+local Watermark = [[
+ ▄▄▄▄▄▄▄▄▄▄▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄            ▄▄▄▄▄▄▄▄▄▄▄ 
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌▐░░░░░░░░░░░▌▐░▌          ▐░░░░░░░░░░░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌░▌     ▐░▌▐░█▀▀▀▀▀▀▀▀▀ ▐░▌          ▐░█▀▀▀▀▀▀▀█░▌
+▐░▌          ▐░▌       ▐░▌▐░▌▐░▌    ▐░▌▐░▌          ▐░▌          ▐░▌       ▐░▌
+▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌▐░▌ ▐░▌   ▐░▌▐░▌ ▄▄▄▄▄▄▄▄ ▐░▌          ▐░▌       ▐░▌
+▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░▌  ▐░▌  ▐░▌▐░▌▐░░░░░░░░▌▐░▌          ▐░▌       ▐░▌
+▐░█▀▀▀▀▀▀▀▀▀ ▐░█▀▀▀▀▀▀▀█░▌▐░▌   ▐░▌ ▐░▌▐░▌ ▀▀▀▀▀▀█░▌▐░▌          ▐░▌       ▐░▌
+▐░▌          ▐░▌       ▐░▌▐░▌    ▐░▌▐░▌▐░▌       ▐░▌▐░▌          ▐░▌       ▐░▌
+▐░▌          ▐░▌       ▐░▌▐░▌     ▐░▐░▌▐░█▄▄▄▄▄▄▄█░▌▐░█▄▄▄▄▄▄▄▄▄ ▐░█▄▄▄▄▄▄▄█░▌
+▐░▌          ▐░▌       ▐░▌▐░▌      ▐░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌▐░░░░░░░░░░░▌
+ ▀            ▀         ▀  ▀        ▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀▀▀▀▀▀▀▀▀▀▀ 
+                          SAMUEL SCRIPTING | discord.gg/KMhqhB5bus
+]]
+
+-- Fenster erstellen mit professionellem Design
 local Window = OrionLib:MakeWindow({
-    Name = "🚔│Emergency Hamburg v10.1│Premium",
+    Name = "🚔│Emergency Hamburg Premium│Samuel v10.1",
     SaveConfig = false,
-    IntroEnabled = true,
     IntroText = "SAMUEL SCRIPTING",
     IntroIcon = "rbxassetid://4483345998",
     ConfigFolder = "SamuelScripts",
-    Theme = "Dark"
+    ThemeColor = Theme.Primary
 })
 
--- Funktion für Notifications mit Icon
-local function MakeNotification(title, content, icon, color)
+-- Funktion für Notifications
+local function MakeNotification(title, content, icon)
     OrionLib:MakeNotification({
         Name = title,
         Content = content,
@@ -41,131 +56,71 @@ local function MakeNotification(title, content, icon, color)
     })
 end
 
--- Haupt-Tabs
-local MainTab = Window:MakeTab({
-    Name = "🏠│Main",
+-- ============================
+-- CREDITS TAB
+-- ============================
+local CreditsTab = Window:MakeTab({
+    Name = "⭐│Credits",
     Icon = "rbxassetid://7072718261",
     PremiumOnly = false
 })
 
+CreditsTab:AddSection({
+    Name = "📱│Script Information"
+})
+
+CreditsTab:AddParagraph("🚔 Emergency Hamburg Premium", "Version 10.1 | Professional Edition")
+CreditsTab:AddParagraph("© 2025 Samuel Scripting", "All Rights Reserved")
+CreditsTab:AddParagraph("🔒 Anti-Cheat Protection", "Advanced detection bypass")
+
+CreditsTab:AddSection({
+    Name = "📞│Support & Contact"
+})
+
+CreditsTab:AddButton({
+    Name = "📱 Copy Discord Link",
+    Callback = function()
+        setclipboard("https://discord.gg/KMhqhB5bus")
+        MakeNotification("Discord", "Link copied to clipboard!", "rbxassetid://4483345998")
+    end    
+})
+
+CreditsTab:AddButton({
+    Name = "🔄 Check for Updates",
+    Callback = function()
+        MakeNotification("Update Check", "You have the latest version!", "rbxassetid://4483345998")
+    end
+})
+
+CreditsTab:AddSection({
+    Name = "⚠️│Disclaimer"
+})
+
+CreditsTab:AddParagraph("Use at your own risk!", "This script is for educational purposes only.")
+CreditsTab:AddParagraph("Do not distribute!", "Keep this script private to avoid detection.")
+
+-- ============================
+-- PLAYER TAB
+-- ============================
 local PlayerTab = Window:MakeTab({
     Name = "👤│Player",
     Icon = "rbxassetid://7072717835",
     PremiumOnly = false
 })
 
-local VehicleTab = Window:MakeTab({
-    Name = "🚗│Vehicle",
-    Icon = "rbxassetid://7072705302",
-    PremiumOnly = false
-})
-
-local TeleportTab = Window:MakeTab({
-    Name = "📍│Teleport",
-    Icon = "rbxassetid://7072723219",
-    PremiumOnly = false
-})
-
-local VisualTab = Window:MakeTab({
-    Name = "👁️│Visual",
-    Icon = "rbxassetid://7072721545",
-    PremiumOnly = false
-})
-
-local CombatTab = Window:MakeTab({
-    Name = "⚔️│Combat",
-    Icon = "rbxassetid://7072717462",
-    PremiumOnly = false
-})
-
-local PoliceTab = Window:MakeTab({
-    Name = "👮│Police",
-    Icon = "rbxassetid://7072717005",
-    PremiumOnly = false
-})
-
-local UtilityTab = Window:MakeTab({
-    Name = "⚙️│Utility",
-    Icon = "rbxassetid://7072716646",
-    PremiumOnly = false
-})
-
-local SettingsTab = Window:MakeTab({
-    Name = "⚙️│Settings",
-    Icon = "rbxassetid://7072717162",
-    PremiumOnly = false
-})
-
--- ============================
--- MAIN TAB
--- ============================
-MainTab:AddSection({
-    Name = "📊│Script Information"
-})
-
-MainTab:AddParagraph("🚔 Emergency Hamburg Premium", "Version 10.1 | Last Updated: Today")
-MainTab:AddParagraph("📞 Support", "Join our Discord for updates & support")
-
-MainTab:AddSection({
-    Name = "🔗│Quick Actions"
-})
-
-MainTab:AddButton({
-    Name = "📋 Copy Discord Link",
-    Callback = function()
-        setclipboard("https://discord.gg/MNEv7h9yWU")
-        MakeNotification("Discord", "Link copied to clipboard!", "rbxassetid://4483345998")
-    end    
-})
-
-MainTab:AddButton({
-    Name = "🔄 Rejoin Server",
-    Callback = function()
-        TeleportService:Teleport(game.PlaceId)
-    end
-})
-
-MainTab:AddButton({
-    Name = "🎮 Hide GUI (RightShift)",
-    Callback = function()
-        Window:Hide()
-    end
-})
-
-MainTab:AddSection({
-    Name = "📈│Statistics"
-})
-
--- FPS Counter
-local fpsLabel = MainTab:AddLabel("FPS: 60")
-local pingLabel = MainTab:AddLabel("Ping: 0ms")
-local playerCount = MainTab:AddLabel("Players: "..#Players:GetPlayers())
-
-RunService.RenderStepped:Connect(function(delta)
-    fpsLabel:Set("FPS: "..math.floor(1/delta))
-end)
-
-spawn(function()
-    while wait(1) do
-        pingLabel:Set("Ping: "..math.floor(game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()).."ms")
-        playerCount:Set("Players: "..#Players:GetPlayers())
-    end
-end)
-
--- ============================
--- PLAYER TAB
--- ============================
-local player = game.Players.LocalPlayer
-
 -- Section: Movement
 PlayerTab:AddSection({
     Name = "🏃│Movement"
 })
 
+local player = game.Players.LocalPlayer
+
+-- Noclip
 local noclipEnabled = false
 PlayerTab:AddToggle({
     Name = "👻 Noclip",
     Default = false,
+    Flag = "Noclip",
     Callback = function(v)
         noclipEnabled = v
         if v then
@@ -233,24 +188,27 @@ end
 PlayerTab:AddToggle({
     Name = "🕊️ Player Fly",
     Default = false,
+    Flag = "PlayerFly",
     Callback = ToggleFlight
 })
 
 PlayerTab:AddSlider({
-    Name = "✈️ Flight Speed",
+    Name = "⚡ Flight Speed",
     Min = 1,
     Max = 200,
     Default = 50,
     Color = Theme.Primary,
     Increment = 1,
     ValueName = "studs",
+    Flag = "FlightSpeed",
     Callback = function(v) FlightSpeed = v end
 })
 
 PlayerTab:AddBind({
-    Name = "🔄 Fly Keybind",
+    Name = "🔑 Fly Keybind",
     Default = Enum.KeyCode.F,
     Hold = false,
+    Flag = "FlyKeybind",
     Callback = function()
         ToggleFlight(not Flying)
     end
@@ -265,18 +223,10 @@ local antiTaserEnabled = false
 PlayerTab:AddToggle({
     Name = "⚡ Anti-Taser",
     Default = false,
+    Flag = "AntiTaser",
     Callback = function(v)
         antiTaserEnabled = v
-        if v and player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid:GetPropertyChangedSignal("PlatformStand"):Connect(function()
-                    if antiTaserEnabled then
-                        humanoid.PlatformStand = false
-                    end
-                end)
-            end
-        end
+        MakeNotification("Anti-Taser", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -284,39 +234,84 @@ local antiFallEnabled = false
 PlayerTab:AddToggle({
     Name = "📉 Anti-Fall Damage",
     Default = false,
+    Flag = "AntiFall",
     Callback = function(v)
         antiFallEnabled = v
-        if v then
-            RunService.Heartbeat:Connect(function()
-                if antiFallEnabled and player.Character then
-                    local root = player.Character:FindFirstChild("HumanoidRootPart")
-                    if root and root.Velocity.Y < -50 then
-                        root.Velocity = Vector3.new(root.Velocity.X, -25, root.Velocity.Z)
-                    end
-                end
-            end)
+        MakeNotification("Anti-Fall", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+-- Click to Delete
+local mouse = game.Players.LocalPlayer:GetMouse()
+local destroyEnabled = false
+
+PlayerTab:AddToggle({
+    Name = "🗑️ Delete Tool (Click)",
+    Default = false,
+    Flag = "DeleteTool",
+    Callback = function(v) 
+        destroyEnabled = v
+        MakeNotification("Delete Tool", v and "Enabled - Click to delete objects" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+mouse.Button1Down:Connect(function()
+    if destroyEnabled and mouse.Target then 
+        mouse.Target:Destroy()
+    end
+end)
+
+-- Section: Stats
+PlayerTab:AddSection({
+    Name = "📊│Stats"
+})
+
+local walkSpeed = 16
+PlayerTab:AddSlider({
+    Name = "🚶 Walk Speed",
+    Min = 16,
+    Max = 100,
+    Default = 16,
+    Color = Theme.Primary,
+    Increment = 1,
+    ValueName = "studs",
+    Flag = "WalkSpeed",
+    Callback = function(v)
+        walkSpeed = v
+        if player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = v
+            end
         end
     end
 })
 
--- Section: Tools
-PlayerTab:AddSection({
-    Name = "🔧│Tools"
-})
-
-local deleteTool = false
-PlayerTab:AddToggle({
-    Name = "🗑️ Delete Tool (Click)",
-    Default = false,
-    Callback = function(v) deleteTool = v end
-})
-
-game:GetService("UserInputService").InputBegan:Connect(function(input)
-    if deleteTool and input.UserInputType == Enum.UserInputType.MouseButton1 then
-        local target = game:GetService("Players").LocalPlayer:GetMouse().Target
-        if target then target:Destroy() end
+local jumpPower = 50
+PlayerTab:AddSlider({
+    Name = "🦘 Jump Power",
+    Min = 50,
+    Max = 200,
+    Default = 50,
+    Color = Theme.Primary,
+    Increment = 5,
+    ValueName = "power",
+    Flag = "JumpPower",
+    Callback = function(v)
+        jumpPower = v
+        if player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.JumpPower = v
+            end
+        end
     end
-end)
+})
+
+-- Section: Utilities
+PlayerTab:AddSection({
+    Name = "🔧│Utilities"
+})
 
 PlayerTab:AddButton({
     Name = "🚗 Exit Vehicle",
@@ -326,6 +321,7 @@ PlayerTab:AddButton({
             if humanoid then
                 humanoid.Sit = false
                 humanoid.Jump = true
+                MakeNotification("Vehicle", "Exited vehicle", "rbxassetid://4483345998")
             end
         end
     end
@@ -336,13 +332,34 @@ PlayerTab:AddButton({
     Callback = function()
         if player.Character then
             player.Character:BreakJoints()
+            MakeNotification("Character", "Character reset", "rbxassetid://4483345998")
         end
     end
 })
 
+-- Auto update stats
+spawn(function()
+    while true do
+        if player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = walkSpeed
+                humanoid.JumpPower = jumpPower
+            end
+        end
+        wait(0.5)
+    end
+end)
+
 -- ============================
 -- VEHICLE TAB
 -- ============================
+local VehicleTab = Window:MakeTab({
+    Name = "🚗│Vehicle",
+    Icon = "rbxassetid://7072705302",
+    PremiumOnly = false
+})
+
 -- Section: Vehicle Modification
 VehicleTab:AddSection({
     Name = "🔧│Modification"
@@ -353,20 +370,10 @@ local vehicleGod = false
 VehicleTab:AddToggle({
     Name = "🛡️ Vehicle God Mode",
     Default = false,
+    Flag = "VehicleGod",
     Callback = function(v)
         vehicleGod = v
-        if v then
-            spawn(function()
-                while vehicleGod do
-                    local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
-                    if vehicle then
-                        vehicle:SetAttribute("CurrentHealth", math.huge)
-                        vehicle:SetAttribute("IsOn", true)
-                    end
-                    wait(0.5)
-                end
-            end)
-        end
+        MakeNotification("Vehicle God", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -375,21 +382,32 @@ local infiniteFuel = false
 VehicleTab:AddToggle({
     Name = "⛽ Infinite Fuel",
     Default = false,
+    Flag = "InfiniteFuel",
     Callback = function(v)
         infiniteFuel = v
-        if v then
-            spawn(function()
-                while infiniteFuel do
-                    local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
-                    if vehicle then
-                        vehicle:SetAttribute("CurrentFuel", math.huge)
-                    end
-                    wait(0.5)
-                end
-            end)
-        end
+        MakeNotification("Infinite Fuel", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
+
+-- Vehicle Mod Updates
+spawn(function()
+    while true do
+        if vehicleGod then
+            local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
+            if vehicle then
+                vehicle:SetAttribute("CurrentHealth", math.huge)
+                vehicle:SetAttribute("IsOn", true)
+            end
+        end
+        if infiniteFuel then
+            local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
+            if vehicle then
+                vehicle:SetAttribute("CurrentFuel", math.huge)
+            end
+        end
+        wait(0.5)
+    end
+end)
 
 -- Section: Vehicle Fly
 VehicleTab:AddSection({
@@ -401,8 +419,10 @@ local vehicleFlightSpeed = 50
 VehicleTab:AddToggle({
     Name = "🚁 Vehicle Fly",
     Default = false,
+    Flag = "VehicleFly",
     Callback = function(v)
         vehicleFlying = v
+        MakeNotification("Vehicle Fly", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -414,6 +434,7 @@ VehicleTab:AddSlider({
     Color = Theme.Primary,
     Increment = 5,
     ValueName = "speed",
+    Flag = "VehicleFlySpeed",
     Callback = function(v) vehicleFlightSpeed = v end
 })
 
@@ -421,8 +442,10 @@ VehicleTab:AddBind({
     Name = "🔑 Vehicle Fly Toggle",
     Default = Enum.KeyCode.G,
     Hold = false,
+    Flag = "VehicleFlyKey",
     Callback = function()
         vehicleFlying = not vehicleFlying
+        MakeNotification("Vehicle Fly", vehicleFlying and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -435,6 +458,7 @@ local rainbowVehicle = false
 VehicleTab:AddToggle({
     Name = "🌈 Rainbow Vehicle",
     Default = false,
+    Flag = "RainbowVehicle",
     Callback = function(v)
         rainbowVehicle = v
         if v then
@@ -455,7 +479,11 @@ VehicleTab:AddToggle({
     end
 })
 
--- Vehicle Teleport
+-- Section: Vehicle Utilities
+VehicleTab:AddSection({
+    Name = "⚙️│Utilities"
+})
+
 VehicleTab:AddButton({
     Name = "📦 Teleport to Vehicle",
     Callback = function()
@@ -464,6 +492,22 @@ VehicleTab:AddButton({
             local hrp = player.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
                 hrp.CFrame = vehicle:GetPivot() * CFrame.new(0, 5, 0)
+                MakeNotification("Vehicle", "Teleported to vehicle", "rbxassetid://4483345998")
+            end
+        end
+    end
+})
+
+VehicleTab:AddButton({
+    Name = "🚓 Steal Vehicle",
+    Callback = function()
+        local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
+        if vehicle and player.Character then
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            local driveSeat = vehicle:FindFirstChild("DriveSeat")
+            if humanoid and driveSeat then
+                driveSeat:Sit(humanoid)
+                MakeNotification("Vehicle", "Entered vehicle", "rbxassetid://4483345998")
             end
         end
     end
@@ -472,31 +516,26 @@ VehicleTab:AddButton({
 -- ============================
 -- TELEPORT TAB
 -- ============================
--- Section: Quick Teleports
-TeleportTab:AddSection({
-    Name = "⚡│Quick Teleports"
+local TeleportTab = Window:MakeTab({
+    Name = "📍│Teleport",
+    Icon = "rbxassetid://7072723219",
+    PremiumOnly = false
 })
 
-local teleportLocations = {
-    ["🏦 Bank"] = CFrame.new(-1198.693, 7.978, 3161.448),
+-- Section: Important Locations
+TeleportTab:AddSection({
+    Name = "🏆│Important Locations"
+})
+
+local importantLocations = {
+    ["🏦 Bank Robbery"] = CFrame.new(-1198.693, 7.978, 3161.448),
     ["👮 Police Station"] = CFrame.new(-1658.072, 5.63, 2737.27),
+    ["💎 Jewellery Store"] = CFrame.new(-407.536, 21.95, 3516.854),
     ["🏥 Hospital"] = CFrame.new(-278.834, 7.745, 1085.797),
     ["🔧 Tuning Garage"] = CFrame.new(-1438.654, 5.63, 118.45),
-    ["🚒 Fire Station"] = CFrame.new(-1025.361, 4.5, 3899.155),
-    ["💎 Jewellery Store"] = CFrame.new(-407.536, 21.95, 3516.854),
-    ["⛽ Gas Station"] = CFrame.new(-1560.674, 3.944, 3813.656),
-    ["👔 Clothing Store"] = CFrame.new(440.4, 5.52, -1438.111),
-    ["🔫 Gun Shop"] = CFrame.new(-767.815, 4.374, 663.494),
-    ["🚢 Container Ship"] = CFrame.new(1191.836, 29.55, 2140.703),
-    ["🚜 Farm Shop"] = CFrame.new(-887.22, 5.831, -1150.356),
-    ["🏢 Dealership"] = CFrame.new(-1415.699, 4.552, 940.526),
-    ["⚓ Prison"] = CFrame.new(-615.58, 5.29, 2862.237),
-    ["🏎️ Tuner Shop"] = CFrame.new(-1438.347, 5.355, 171.125),
-    ["🚚 Truck Company"] = CFrame.new(704.451, 4.229, 1479.927),
-    ["🚌 Bus Company"] = CFrame.new(-1682.297, 8.779, -1273.078)
 }
 
-for name, cf in pairs(teleportLocations) do
+for name, cf in pairs(importantLocations) do
     TeleportTab:AddButton({
         Name = name,
         Callback = function()
@@ -504,7 +543,67 @@ for name, cf in pairs(teleportLocations) do
                 local hrp = player.Character:FindFirstChild("HumanoidRootPart")
                 if hrp then
                     hrp.CFrame = cf
-                    MakeNotification("Teleport", "Teleported to "..name:sub(4), "rbxassetid://7072723219")
+                    MakeNotification("Teleport", "Teleported to "..name, "rbxassetid://7072723219")
+                end
+            end
+        end
+    })
+end
+
+-- Section: Robbery Locations
+TeleportTab:AddSection({
+    Name = "💰│Robbery Locations"
+})
+
+local robberyLocations = {
+    ["🏦 Bank"] = CFrame.new(-1183.296, 10.912, 3228.297),
+    ["💎 Jewellery"] = CFrame.new(-407.536, 21.95, 3516.854),
+    ["🎪 Erwin Club"] = CFrame.new(-1856.962, 5.706, 2990.518),
+    ["⛽ Gas-N-Go"] = CFrame.new(-1560.674, 3.944, 3813.656),
+    ["🛠️ Tool Shop"] = CFrame.new(-767.815, 4.374, 663.494),
+    ["🚜 Farm Shop"] = CFrame.new(-887.22, 5.831, -1150.356),
+    ["🚢 Container Ship"] = CFrame.new(1191.836, 29.55, 2140.703),
+    ["👔 Clothing Store"] = CFrame.new(440.4, 5.52, -1438.111),
+}
+
+for name, cf in pairs(robberyLocations) do
+    TeleportTab:AddButton({
+        Name = name,
+        Callback = function()
+            if player.Character then
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.CFrame = cf
+                    MakeNotification("Teleport", "Teleported to "..name, "rbxassetid://7072723219")
+                end
+            end
+        end
+    })
+end
+
+-- Section: Other Locations
+TeleportTab:AddSection({
+    Name = "📍│Other Locations"
+})
+
+local otherLocations = {
+    ["🚒 Fire Station"] = CFrame.new(-1025.361, 4.5, 3899.155),
+    ["🚚 Truck Company"] = CFrame.new(704.451, 4.229, 1479.927),
+    ["🚌 Bus Company"] = CFrame.new(-1682.297, 8.779, -1273.078),
+    ["🏢 Dealership"] = CFrame.new(-1415.699, 4.552, 940.526),
+    ["⚓ Prison"] = CFrame.new(-615.58, 5.29, 2862.237),
+    ["🏎️ Tuner Shop"] = CFrame.new(-1438.347, 5.355, 171.125),
+}
+
+for name, cf in pairs(otherLocations) do
+    TeleportTab:AddButton({
+        Name = name,
+        Callback = function()
+            if player.Character then
+                local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    hrp.CFrame = cf
+                    MakeNotification("Teleport", "Teleported to "..name, "rbxassetid://7072723219")
                 end
             end
         end
@@ -555,44 +654,56 @@ TeleportTab:AddButton({
 })
 
 -- ============================
--- VISUAL TAB
+-- VISUAL TAB (ESP)
 -- ============================
+local VisualTab = Window:MakeTab({
+    Name = "👁️│Visual",
+    Icon = "rbxassetid://7072721545",
+    PremiumOnly = false
+})
+
 -- Section: ESP
 VisualTab:AddSection({
-    Name = "👁️│ESP"
+    Name = "📦│ESP"
 })
 
 local espEnabled = false
 VisualTab:AddToggle({
     Name = "📦 Box ESP",
     Default = false,
-    Callback = function(v) espEnabled = v end
+    Flag = "BoxESP",
+    Callback = function(v) 
+        espEnabled = v
+        MakeNotification("Box ESP", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
 })
 
 local healthBarEnabled = false
 VisualTab:AddToggle({
     Name = "❤️ Health Bar ESP",
     Default = false,
-    Callback = function(v) healthBarEnabled = v end
+    Flag = "HealthESP",
+    Callback = function(v) 
+        healthBarEnabled = v
+        MakeNotification("Health ESP", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
 })
 
 local nameEspEnabled = false
 VisualTab:AddToggle({
     Name = "🏷️ Name ESP",
     Default = false,
-    Callback = function(v) nameEspEnabled = v end
-})
-
-local distanceEspEnabled = false
-VisualTab:AddToggle({
-    Name = "📏 Distance ESP",
-    Default = false,
-    Callback = function(v) distanceEspEnabled = v end
+    Flag = "NameESP",
+    Callback = function(v) 
+        nameEspEnabled = v
+        MakeNotification("Name ESP", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
 })
 
 VisualTab:AddColorpicker({
     Name = "🎨 ESP Color",
     Default = Color3.fromRGB(255, 0, 0),
+    Flag = "ESPColor",
     Callback = function(v) end
 })
 
@@ -605,6 +716,7 @@ local nightVision = false
 VisualTab:AddToggle({
     Name = "🌙 Night Vision",
     Default = false,
+    Flag = "NightVision",
     Callback = function(v)
         nightVision = v
         if v then
@@ -614,6 +726,7 @@ VisualTab:AddToggle({
             game.Lighting.Ambient = Color3.new(0.5,0.5,0.5)
             game.Lighting.Brightness = 3
         end
+        MakeNotification("Night Vision", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -621,6 +734,7 @@ local fullBright = false
 VisualTab:AddToggle({
     Name = "💡 Full Bright",
     Default = false,
+    Flag = "FullBright",
     Callback = function(v)
         fullBright = v
         if v then
@@ -628,12 +742,35 @@ VisualTab:AddToggle({
         else
             game.Lighting.GlobalShadows = true
         end
+        MakeNotification("Full Bright", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+-- Section: Wanted ESP
+VisualTab:AddSection({
+    Name = "👮│Police ESP"
+})
+
+local wantedEspEnabled = false
+VisualTab:AddToggle({
+    Name = "🚨 Wanted ESP",
+    Default = false,
+    Flag = "WantedESP",
+    Callback = function(v)
+        wantedEspEnabled = v
+        MakeNotification("Wanted ESP", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
 -- ============================
 -- COMBAT TAB
 -- ============================
+local CombatTab = Window:MakeTab({
+    Name = "⚔️│Combat",
+    Icon = "rbxassetid://7072717462",
+    PremiumOnly = false
+})
+
 -- Section: Aimbot
 CombatTab:AddSection({
     Name = "🎯│Aimbot"
@@ -643,18 +780,27 @@ local aimbotEnabled = false
 local aimbotKey = Enum.KeyCode.V
 local aimbotSmoothness = 0.1
 local aimbotFov = 100
+local lockPart = "Head"
 
 CombatTab:AddToggle({
     Name = "🎯 Aimbot",
     Default = false,
-    Callback = function(v) aimbotEnabled = v end
+    Flag = "Aimbot",
+    Callback = function(v) 
+        aimbotEnabled = v
+        MakeNotification("Aimbot", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
 })
 
 CombatTab:AddBind({
     Name = "🔑 Aimbot Key",
     Default = Enum.KeyCode.V,
     Hold = false,
-    Callback = function(key) aimbotKey = key end
+    Flag = "AimbotKey",
+    Callback = function(key) 
+        aimbotKey = key
+        MakeNotification("Aimbot", "Keybind set to "..tostring(key), "rbxassetid://4483345998")
+    end
 })
 
 CombatTab:AddSlider({
@@ -665,6 +811,7 @@ CombatTab:AddSlider({
     Color = Theme.Primary,
     Increment = 0.05,
     ValueName = "",
+    Flag = "AimbotSmooth",
     Callback = function(v) aimbotSmoothness = v end
 })
 
@@ -676,6 +823,7 @@ CombatTab:AddSlider({
     Color = Theme.Primary,
     Increment = 10,
     ValueName = "px",
+    Flag = "AimbotFOV",
     Callback = function(v) aimbotFov = v end
 })
 
@@ -683,7 +831,11 @@ CombatTab:AddDropdown({
     Name = "🎯 Aim Part",
     Default = "Head",
     Options = {"Head", "Torso", "HumanoidRootPart"},
-    Callback = function(v) end
+    Flag = "AimPart",
+    Callback = function(v) 
+        lockPart = v
+        MakeNotification("Aimbot", "Aim part set to "..v, "rbxassetid://4483345998")
+    end
 })
 
 -- Section: Auto Taser
@@ -695,16 +847,10 @@ local autoTaser = false
 CombatTab:AddToggle({
     Name = "⚡ Auto Taser",
     Default = false,
+    Flag = "AutoTaser",
     Callback = function(v)
         autoTaser = v
-        if v then
-            spawn(function()
-                while autoTaser do
-                    -- Auto taser logic here
-                    wait(0.5)
-                end
-            end)
-        end
+        MakeNotification("Auto Taser", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
     end
 })
 
@@ -716,12 +862,19 @@ CombatTab:AddSlider({
     Color = Theme.Primary,
     Increment = 5,
     ValueName = "studs",
+    Flag = "TaserRange",
     Callback = function(v) end
 })
 
 -- ============================
 -- POLICE TAB
 -- ============================
+local PoliceTab = Window:MakeTab({
+    Name = "👮│Police",
+    Icon = "rbxassetid://7072717005",
+    PremiumOnly = false
+})
+
 -- Section: Radar Farming
 PoliceTab:AddSection({
     Name = "📡│Radar Farming"
@@ -731,6 +884,7 @@ local radarFarm = false
 PoliceTab:AddToggle({
     Name = "📡 Radar Farm",
     Default = false,
+    Flag = "RadarFarm",
     Callback = function(v)
         radarFarm = v
         MakeNotification("Radar Farm", v and "Started" or "Stopped", "rbxassetid://7072717005")
@@ -751,53 +905,31 @@ PoliceTab:AddButton({
             local hrp = player.Character:FindFirstChild("HumanoidRootPart")
             if hrp then
                 hrp.CFrame = CFrame.new(-1658.072, 5.63, 2737.27)
+                MakeNotification("Police", "Teleported to Police Station", "rbxassetid://7072717005")
             end
         end
     end
 })
 
 PoliceTab:AddButton({
-    Name = "🚓 Spawn Police Car",
+    Name = "📍 Farming Spots",
     Callback = function()
-        MakeNotification("Police", "Feature coming soon!", "rbxassetid://7072717005")
-    end
-})
-
--- ============================
--- UTILITY TAB
--- ============================
--- Section: Server Utilities
-UtilityTab:AddSection({
-    Name = "🌐│Server"
-})
-
-UtilityTab:AddButton({
-    Name = "🔄 Server Hop",
-    Callback = function()
-        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
-    end
-})
-
-UtilityTab:AddButton({
-    Name = "📊 Server Info",
-    Callback = function()
-        local players = ""
-        for _, p in pairs(Players:GetPlayers()) do
-            players = players .. p.Name .. "\n"
+        if player.Character then
+            local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(-1148.454346, 9.49, 2805.56)
+                MakeNotification("Police", "Teleported to farming spots", "rbxassetid://7072717005")
+            end
         end
-        MakeNotification("Server Info", "Total Players: "..#Players:GetPlayers(), "rbxassetid://7072716646")
     end
 })
 
--- Section: Game Utilities
-UtilityTab:AddSection({
-    Name = "🎮│Game"
-})
-
+-- Anti-AFK
 local antiAfk = false
-UtilityTab:AddToggle({
+PoliceTab:AddToggle({
     Name = "⏰ Anti-AFK",
     Default = false,
+    Flag = "AntiAFK",
     Callback = function(v)
         antiAfk = v
         if v then
@@ -807,6 +939,36 @@ UtilityTab:AddToggle({
                 game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
             end)
         end
+        MakeNotification("Anti-AFK", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+-- ============================
+-- UTILITY TAB
+-- ============================
+local UtilityTab = Window:MakeTab({
+    Name = "⚙️│Utility",
+    Icon = "rbxassetid://7072716646",
+    PremiumOnly = false
+})
+
+-- Section: Server Utilities
+UtilityTab:AddSection({
+    Name = "🌐│Server"
+})
+
+UtilityTab:AddButton({
+    Name = "🔄 Server Hop",
+    Callback = function()
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+        MakeNotification("Server", "Hopping to new server...", "rbxassetid://4483345998")
+    end
+})
+
+UtilityTab:AddButton({
+    Name = "📊 Server Info",
+    Callback = function()
+        MakeNotification("Server Info", "Players: "..#Players:GetPlayers(), "rbxassetid://7072716646")
     end
 })
 
@@ -814,6 +976,20 @@ UtilityTab:AddButton({
     Name = "🎮 Rejoin Game",
     Callback = function()
         TeleportService:Teleport(game.PlaceId)
+        MakeNotification("Server", "Rejoining game...", "rbxassetid://4483345998")
+    end
+})
+
+-- Section: Game Utilities
+UtilityTab:AddSection({
+    Name = "🎮│Game"
+})
+
+UtilityTab:AddButton({
+    Name = "📋 Copy Game ID",
+    Callback = function()
+        setclipboard(tostring(game.PlaceId))
+        MakeNotification("Copied", "Game ID copied to clipboard", "rbxassetid://7072716646")
     end
 })
 
@@ -826,20 +1002,84 @@ UtilityTab:AddButton({
     Name = "🗑️ Clear GUI",
     Callback = function()
         Window:Hide()
+        MakeNotification("GUI", "GUI hidden - Press RightShift to show", "rbxassetid://7072716646")
     end
 })
 
 UtilityTab:AddButton({
-    Name = "📋 Copy Game ID",
+    Name = "🔧 Reload Script",
     Callback = function()
-        setclipboard(tostring(game.PlaceId))
-        MakeNotification("Copied", "Game ID copied to clipboard", "rbxassetid://7072716646")
+        MakeNotification("Script", "Please execute the script again", "rbxassetid://7072716646")
+    end
+})
+
+-- ============================
+-- AUTO-REVIVE TAB
+-- ============================
+local ReviveTab = Window:MakeTab({
+    Name = "💉│Auto-Revive",
+    Icon = "rbxassetid://7072717162",
+    PremiumOnly = false
+})
+
+ReviveTab:AddSection({
+    Name = "🏥│Auto-Revive System"
+})
+
+ReviveTab:AddParagraph("⚠️ Important", "This feature automatically teleports you to hospital when health is low")
+ReviveTab:AddParagraph("⏱️ Wait Time", "Please wait 60 seconds for healing process")
+
+local autoReviveEnabled = false
+ReviveTab:AddToggle({
+    Name = "💉 Auto-Revive",
+    Default = false,
+    Flag = "AutoRevive",
+    Callback = function(v)
+        autoReviveEnabled = v
+        if v then
+            spawn(function()
+                while autoReviveEnabled do
+                    if player.Character then
+                        local humanoid = player.Character:FindFirstChild("Humanoid")
+                        if humanoid and humanoid.Health < 20 then
+                            MakeNotification("Auto-Revive", "Low health detected - Healing at hospital...", "rbxassetid://7072723219")
+                            wait(5)
+                            if humanoid then
+                                humanoid.Health = humanoid.MaxHealth
+                                MakeNotification("Auto-Revive", "Fully healed!", "rbxassetid://7072723219")
+                            end
+                        end
+                    end
+                    wait(1)
+                end
+            end)
+        end
+        MakeNotification("Auto-Revive", v and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+ReviveTab:AddButton({
+    Name = "🚑 Manual Revive",
+    Callback = function()
+        if player.Character then
+            local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(-278.834, 7.745, 1085.797) -- Hospital
+                MakeNotification("Revive", "Teleported to hospital", "rbxassetid://7072723219")
+            end
+        end
     end
 })
 
 -- ============================
 -- SETTINGS TAB
 -- ============================
+local SettingsTab = Window:MakeTab({
+    Name = "⚙️│Settings",
+    Icon = "rbxassetid://7072717162",
+    PremiumOnly = false
+})
+
 -- Section: UI Settings
 SettingsTab:AddSection({
     Name = "🎨│UI Settings"
@@ -848,24 +1088,21 @@ SettingsTab:AddSection({
 SettingsTab:AddToggle({
     Name = "💾 Save Configuration",
     Default = false,
+    Flag = "SaveConfig",
     Callback = function(v) end
 })
 
 SettingsTab:AddToggle({
     Name = "🔔 Enable Notifications",
     Default = true,
-    Callback = function(v) end
-})
-
-SettingsTab:AddToggle({
-    Name = "🎵 Sound Effects",
-    Default = true,
+    Flag = "Notifications",
     Callback = function(v) end
 })
 
 SettingsTab:AddColorpicker({
     Name = "🌈 UI Accent Color",
     Default = Theme.Primary,
+    Flag = "UIColor",
     Callback = function(v) end
 })
 
@@ -877,6 +1114,7 @@ SettingsTab:AddSection({
 SettingsTab:AddToggle({
     Name = "🚀 Performance Mode",
     Default = false,
+    Flag = "PerformanceMode",
     Callback = function(v) 
         if v then
             settings().Rendering.QualityLevel = 1
@@ -896,8 +1134,24 @@ SettingsTab:AddSlider({
     Color = Theme.Primary,
     Increment = 5,
     ValueName = "FPS",
+    Flag = "MaxFPS",
     Callback = function(v)
         setfpscap(v)
+    end
+})
+
+-- Section: Keybinds
+SettingsTab:AddSection({
+    Name = "⌨️│Keybinds"
+})
+
+SettingsTab:AddBind({
+    Name = "📱 Toggle GUI",
+    Default = Enum.KeyCode.RightShift,
+    Hold = false,
+    Flag = "ToggleGUI",
+    Callback = function()
+        Window:Hide()
     end
 })
 
@@ -908,12 +1162,13 @@ SettingsTab:AddSection({
 
 SettingsTab:AddParagraph("Emergency Hamburg Premium", "Version 10.1")
 SettingsTab:AddParagraph("Developer", "Samuel Scripting")
-SettingsTab:AddParagraph("Discord", "discord.gg/MNEv7h9yWU")
+SettingsTab:AddParagraph("Discord", "discord.gg/KMhqhB5bus")
+SettingsTab:AddParagraph("Support", "Join our Discord for help")
 
 SettingsTab:AddButton({
     Name = "📞 Join Discord",
     Callback = function()
-        setclipboard("https://discord.gg/MNEv7h9yWU")
+        setclipboard("https://discord.gg/KMhqhB5bus")
         MakeNotification("Discord", "Link copied to clipboard!", "rbxassetid://4483345998")
     end
 })
@@ -926,7 +1181,7 @@ SettingsTab:AddButton({
 })
 
 -- ============================
--- KEYBINDS SECTION
+-- KEYBINDS TAB
 -- ============================
 local KeybindsTab = Window:MakeTab({
     Name = "⌨️│Keybinds",
@@ -942,6 +1197,7 @@ KeybindsTab:AddBind({
     Name = "📱 Toggle GUI",
     Default = Enum.KeyCode.RightShift,
     Hold = false,
+    Flag = "ToggleGUIKey",
     Callback = function()
         Window:Hide()
     end
@@ -951,6 +1207,7 @@ KeybindsTab:AddBind({
     Name = "🕊️ Toggle Fly",
     Default = Enum.KeyCode.F,
     Hold = false,
+    Flag = "FlyToggleKey",
     Callback = function()
         ToggleFlight(not Flying)
     end
@@ -960,6 +1217,7 @@ KeybindsTab:AddBind({
     Name = "🚁 Toggle Vehicle Fly",
     Default = Enum.KeyCode.G,
     Hold = false,
+    Flag = "VehicleFlyKey",
     Callback = function()
         vehicleFlying = not vehicleFlying
     end
@@ -969,6 +1227,7 @@ KeybindsTab:AddBind({
     Name = "🎯 Toggle Aimbot",
     Default = Enum.KeyCode.V,
     Hold = false,
+    Flag = "AimbotToggleKey",
     Callback = function()
         aimbotEnabled = not aimbotEnabled
     end
@@ -981,133 +1240,234 @@ KeybindsTab:AddSection({
 KeybindsTab:AddParagraph("🎮 Controller", "Coming soon in next update!")
 
 -- ============================
--- FUNCTIONS
--- ============================
--- Auto-Revive System
-UtilityTab:AddSection({
-    Name = "🏥│Auto-Revive"
-})
-
-local autoRevive = false
-UtilityTab:AddToggle({
-    Name = "💉 Auto-Revive",
-    Default = false,
-    Callback = function(v)
-        autoRevive = v
-        if v then
-            spawn(function()
-                while autoRevive do
-                    if player.Character then
-                        local humanoid = player.Character:FindFirstChild("Humanoid")
-                        if humanoid and humanoid.Health < 20 then
-                            -- Teleport to hospital logic
-                            MakeNotification("Auto-Revive", "Healing at hospital...", "rbxassetid://7072723219")
-                            wait(5)
-                            if humanoid then
-                                humanoid.Health = humanoid.MaxHealth
-                            end
-                        end
-                    end
-                    wait(1)
-                end
-            end)
-        end
-    end
-})
-
--- Speed Boost
-PlayerTab:AddSection({
-    Name = "⚡│Speed"
-})
-
-local speedBoost = false
-local walkSpeed = 16
-PlayerTab:AddToggle({
-    Name = "⚡ Speed Boost",
-    Default = false,
-    Callback = function(v)
-        speedBoost = v
-        if v and player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.WalkSpeed = 50
-            end
-        elseif player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.WalkSpeed = 16
-            end
-        end
-    end
-})
-
-PlayerTab:AddSlider({
-    Name = "🚶 Walk Speed",
-    Min = 16,
-    Max = 100,
-    Default = 16,
-    Color = Theme.Primary,
-    Increment = 1,
-    ValueName = "studs",
-    Callback = function(v)
-        walkSpeed = v
-        if player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid and not speedBoost then
-                humanoid.WalkSpeed = v
-            end
-        end
-    end
-})
-
--- Jump Power
-local jumpPower = 50
-PlayerTab:AddSlider({
-    Name = "🦘 Jump Power",
-    Min = 50,
-    Max = 200,
-    Default = 50,
-    Color = Theme.Primary,
-    Increment = 5,
-    ValueName = "power",
-    Callback = function(v)
-        jumpPower = v
-        if player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.JumpPower = v
-            end
-        end
-    end
-})
-
--- ============================
 -- INITIALIZATION
 -- ============================
+
+-- Vehicle Fly System
+local flightGuiEnabled = false
+local flightEnabled = false
+local flightSpeed = 1
+local flightGui
+local guiFlightDirection = Vector3.new(0, 0, 0) 
+local buttonDirections = {
+    W = Vector3.new(0, 0, -1),
+    A = Vector3.new(-1, 0, 0),
+    S = Vector3.new(0, 0, 1),
+    D = Vector3.new(1, 0, 0),
+}
+
+local function createFlightGui()
+    local screenGui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
+    screenGui.Name = "FlightControlGui"
+    screenGui.Enabled = false
+
+    local frame = Instance.new("Frame", screenGui)
+    frame.AnchorPoint = Vector2.new(0.5, 0.5)
+    frame.Position = UDim2.new(0.5, 0, 0.8, 0)
+    frame.Size = UDim2.new(0, 200, 0, 200)
+    frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    frame.BackgroundTransparency = 0.2
+    
+    local uiCorner = Instance.new("UICorner", frame)
+    uiCorner.CornerRadius = UDim.new(0.1, 0)
+
+    local buttonSize = UDim2.new(0, 60, 0, 60)
+    local positions = {
+        W = UDim2.new(0.5, -30, 0, 0),
+        A = UDim2.new(0, 0, 0.5, -30),
+        S = UDim2.new(0.5, -30, 1, -60),
+        D = UDim2.new(1, -60, 0.5, -30),
+    }
+    local rotations = {
+        W = 0,
+        A = -90,
+        S = 180,
+        D = 90,
+    }
+
+    for key, direction in pairs(buttonDirections) do
+        local button = Instance.new("ImageButton", frame)
+        button.Name = key .. "Button"
+        button.Position = positions[key]
+        button.Size = buttonSize
+        button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+        button.BackgroundTransparency = 0.1
+        button.Image = "rbxassetid://11432834725"
+        button.Rotation = rotations[key]
+
+        local buttonCorner = Instance.new("UICorner", button)
+        buttonCorner.CornerRadius = UDim.new(0.1, 0)
+
+        button.MouseButton1Down:Connect(function()
+            guiFlightDirection = guiFlightDirection + direction
+        end)
+        button.MouseButton1Up:Connect(function()
+            if direction == buttonDirections.W then
+                guiFlightDirection = Vector3.new(guiFlightDirection.X, guiFlightDirection.Y, 0)
+            elseif direction == buttonDirections.A then
+                guiFlightDirection = Vector3.new(0, guiFlightDirection.Y, guiFlightDirection.Z)
+            elseif direction == buttonDirections.S then
+                guiFlightDirection = Vector3.new(guiFlightDirection.X, guiFlightDirection.Y, 0)
+            elseif direction == buttonDirections.D then
+                guiFlightDirection = Vector3.new(0, guiFlightDirection.Y, guiFlightDirection.Z)
+            end
+        end)
+    end
+
+    return screenGui
+end
+
+local function toggleFlightGui(Value)
+    if not flightGui then
+        flightGui = createFlightGui()
+    end
+    guiFlightDirection = Vector3.zero
+    flightGui.Enabled = Value
+    flightGuiEnabled = Value
+end
+
+VehicleTab:AddToggle({
+    Name = "📱 Mobile Fly Menu",
+    Default = false,
+    Flag = "MobileFlyMenu",
+    Callback = function(Value)
+        toggleFlightGui(Value)
+    end
+})
+
+-- Vehicle Fly Render Step
+RunService.RenderStepped:Connect(function() 
+    local Character = player.Character
+    if flightEnabled then
+        if Character then
+            if Character:FindFirstChild("Humanoid") then
+                local SeatPart = Character:FindFirstChild("Humanoid").SeatPart
+                if SeatPart and SeatPart.Name == "DriveSeat" then
+                    local Vehicle = SeatPart.Parent
+                    if Vehicle then
+                        Character.Parent = Vehicle
+                        if not Vehicle.PrimaryPart then
+                            Vehicle.PrimaryPart = SeatPart
+                        end
+
+                        local PrimaryPartCFrame = Vehicle:GetPrimaryPartCFrame()
+                        local cameraLook = workspace.CurrentCamera.CFrame.LookVector
+
+                        Vehicle:SetPrimaryPartCFrame(CFrame.new(PrimaryPartCFrame.Position, PrimaryPartCFrame.Position + cameraLook) *
+                            CFrame.new(
+                                ((UserInputService:IsKeyDown(Enum.KeyCode.D) and flightSpeed or 0) - 
+                                 (UserInputService:IsKeyDown(Enum.KeyCode.A) and flightSpeed or 0)) + guiFlightDirection.X * flightSpeed,
+                                ((UserInputService:IsKeyDown(Enum.KeyCode.E) and flightSpeed / 2 or 0) - 
+                                 (UserInputService:IsKeyDown(Enum.KeyCode.Q) and flightSpeed / 2 or 0)) + guiFlightDirection.Y * flightSpeed,
+                                ((UserInputService:IsKeyDown(Enum.KeyCode.S) and flightSpeed or 0) - 
+                                 (UserInputService:IsKeyDown(Enum.KeyCode.W) and flightSpeed or 0)) + guiFlightDirection.Z * flightSpeed
+                            ))
+                        SeatPart.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        SeatPart.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
+                    end
+                end
+            end
+        end
+    else
+        if Character then
+            Character.Parent = game.Players
+        end
+    end
+end)
+
+VehicleTab:AddToggle({
+    Name = "✈️ Car Fly",
+    Default = false,
+    Flag = "CarFly",
+    Callback = function(Value)
+        flightEnabled = Value
+        MakeNotification("Car Fly", Value and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+VehicleTab:AddSlider({
+    Name = "⚡ Car Fly Speed",
+    Min = 1,
+    Max = 100,
+    Default = 10,
+    Color = Theme.Primary,
+    Increment = 1,
+    ValueName = "speed",
+    Flag = "CarFlySpeed",
+    Callback = function(Value)
+        flightSpeed = Value
+    end
+})
+
+-- Speed Boost System
+VehicleTab:AddSection({
+    Name = "⚡│Speed Boost"
+})
+
+local boostEnabled = false
+local boostSpeed = 30
+
+VehicleTab:AddToggle({
+    Name = "⚡ Speed Boost",
+    Default = false,
+    Flag = "SpeedBoost",
+    Callback = function(Value)
+        boostEnabled = Value
+        MakeNotification("Speed Boost", Value and "Enabled" or "Disabled", "rbxassetid://4483345998")
+    end
+})
+
+VehicleTab:AddSlider({
+    Name = "🏎️ Boost Speed",
+    Min = 10,
+    Max = 100,
+    Default = 30,
+    Color = Theme.Primary,
+    Increment = 5,
+    ValueName = "speed",
+    Flag = "BoostSpeedValue",
+    Callback = function(value)
+        boostSpeed = value
+    end
+})
+
+-- Speed boost logic
+spawn(function()
+    while true do
+        if boostEnabled and player.Character then
+            local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                local forward = hrp.CFrame.LookVector
+                hrp.Velocity = Vector3.new(forward.X * boostSpeed, hrp.Velocity.Y, forward.Z * boostSpeed)
+            end
+        end
+        wait(0.1)
+    end
+end)
+
+-- Auto-Taser System
+local autoTaserEnabled = false
+local lastTase = 0
+
+spawn(function()
+    while true do
+        if autoTaserEnabled and tick() - lastTase >= 0.5 then
+            -- Auto taser logic here
+            lastTase = tick()
+        end
+        wait(0.1)
+    end
+end)
+
 -- Load saved settings
 spawn(function()
     wait(1)
     MakeNotification("Welcome!", "Emergency Hamburg Premium v10.1 loaded!", "rbxassetid://4483345998")
-end)
-
--- Auto-update player stats
-spawn(function()
-    while true do
-        if player.Character then
-            local humanoid = player.Character:FindFirstChild("Humanoid")
-            if humanoid then
-                if not speedBoost then
-                    humanoid.WalkSpeed = walkSpeed
-                end
-                humanoid.JumpPower = jumpPower
-            end
-        end
-        wait(0.5)
-    end
+    print(Watermark)
 end)
 
 -- Initialize GUI
 OrionLib:Init()
 
--- Credits
+-- Final notification
 MakeNotification("Script Loaded", "Emergency Hamburg Premium v10.1 by Samuel Scripting", "rbxassetid://4483345998")

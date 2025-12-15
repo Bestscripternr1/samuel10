@@ -8,138 +8,100 @@ local Camera = workspace.CurrentCamera
 
 -- Fenster erstellen
 local Window = OrionLib:MakeWindow({
-    Name = "│SAMUEL v10.1 │〄Emergency Hamburg",
-    HidePremium = false,
-    SaveConfig = true,
-    ConfigFolder = "SamuelConfig",
-    IntroEnabled = true,
-    IntroText = "SAMUEL'S ULTIMATE",
-    IntroIcon = "rbxassetid://4483345998"
+    Name = "│Samuel v10.1 │〄Emergency Hamburg",
+    SaveConfig = false,
+    IntroText = "Samuel Scripts"
 })
 
--- ===========================
--- CREDITS TAB
--- ===========================
 local Tab = Window:MakeTab({
-    Name = "🔥│Credits",
-    Icon = "rbxassetid://4483345998"
+    Name = "😎│Credits",
 })
 
-Tab:AddSection({
-    Name = "Samuel's Emergency Hamburg"
-})
-
-Tab:AddParagraph("© 2025 Samuel Scripting", "The Ultimate Emergency Hamburg Experience")
+Tab:AddParagraph("© 2025   Samuel Scripting", "")
 
 Tab:AddButton({
-    Name = "📋 Copy Discord Link",
+    Name = "Copying Discord Link",
     Callback = function()
         setclipboard("https://discord.gg/MNEv7h9yWU")
         OrionLib:MakeNotification({
-            Name = "Samuel Discord",
-            Content = "Discord link copied!",
+            Name = "Discord",
+            Content = "Link Copied",
             Image = "rbxassetid://4483345998",
             Time = 5
         })
     end    
 })
 
-Tab:AddButton({
-    Name = "⭐ Rate Script",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "Thanks!",
-            Content = "Thank you for using Samuel's Script!",
-            Time = 3
-        })
-    end
-})
 
--- ===========================
--- PLAYER TAB (Enhanced GUI)
--- ===========================
+--- Player Tab
 local Tab1 = Window:MakeTab({
-    Name = "👤│Player",
-    Icon = "rbxassetid://7734053491"
+    Name = "⚙│Player",
+    PremiumOnly = false
 })
 
--- Section: Movement
+-- Kategorie / Section 1
 Tab1:AddSection({
-    Name = "🚀 Movement"
+    Name = "Player"
 })
 
 local mouse = game.Players.LocalPlayer:GetMouse()
 local destroyEnabled = false
 
 Tab1:AddToggle({
-    Name = "🗑️ Click to Delete",
+    Name = "⚫ Click to Delete",
     Default = false,
-    Callback = function(v) 
-        destroyEnabled = v 
-        OrionLib:MakeNotification({
-            Name = "Samuel Delete",
-            Content = v and "Click to Delete Enabled" or "Click to Delete Disabled",
-            Time = 2
-        })
-    end
+    Callback = function(v) destroyEnabled = v end
 })
 
 mouse.Button1Down:Connect(function()
-    if destroyEnabled and mouse.Target then 
-        mouse.Target:Destroy() 
-    end
+    if destroyEnabled and mouse.Target then mouse.Target:Destroy() end
 end)
+
 
 local player = game.Players.LocalPlayer
 local noclipEnabled = false
 
 local function noclip(enable)
-    local char = player.Character
-    if not char then return end
-    for _, p in pairs(char:GetDescendants()) do
-        if p:IsA("BasePart") then 
-            p.CanCollide = not enable 
-        end
+    for _, p in pairs(player.Character:GetDescendants()) do
+        if p:IsA("BasePart") then p.CanCollide = not enable end
     end
 end
 
 Tab1:AddToggle({
-    Name = "👻 Noclip",
+    Name = "⚫ Noclip",
     Default = false,
     Callback = function(v)
         noclipEnabled = v
         noclip(v)
         if v then
             game:GetService("RunService").Stepped:Connect(function()
-                if noclipEnabled then 
-                    noclip(true) 
-                end
+                if noclipEnabled then noclip(true) end
             end)
         end
-        OrionLib:MakeNotification({
-            Name = "Samuel Noclip",
-            Content = v and "Noclip Enabled" or "Noclip Disabled",
-            Time = 2
-        })
     end
 })
+
 
 -- === Player Fly Variablen ===
 local UserCharacter = nil
 local UserRootPart = nil
+
 local Flying = false
 local FlightSpeed = 50
 local FlightAcceleration = 6
 local CurrentVelocity = Vector3.zero
 local SpeedKey = Enum.KeyCode.LeftControl
 local SpeedKeyMultiplier = 2
+
 local FlightConnection = nil
 
+-- Funktion: Charakter setzen
 local function setCharacter(character)
     UserCharacter = character
     UserRootPart = character:WaitForChild("HumanoidRootPart")
-    ToggleFlight(false)
-    
+
+    ToggleFlight(false) -- Flug aus beim Respawn
+
     local humanoid = character:WaitForChild("Humanoid")
     humanoid.Seated:Connect(function(isSeated)
         if isSeated then
@@ -148,6 +110,7 @@ local function setCharacter(character)
     end)
 end
 
+-- Prüfen ob im Fahrzeug
 local function IsInVehicle()
     if not UserCharacter then return false end
     local humanoid = UserCharacter:FindFirstChildWhichIsA("Humanoid")
@@ -157,6 +120,7 @@ local function IsInVehicle()
     return false
 end
 
+-- Flug Bewegung
 local function Flight(delta)
     local BaseVelocity = Vector3.zero
 
@@ -191,9 +155,10 @@ local function Flight(delta)
     end
 end
 
+-- Flug an/aus
 function ToggleFlight(enable)
     if IsInVehicle() then
-        warn("Samuel Fly: Deaktiviert (im Fahrzeug)")
+        warn("Fliegen deaktiviert: Spieler sitzt im Fahrzeug.")
         if FlightConnection then
             FlightConnection:Disconnect()
             FlightConnection = nil
@@ -217,45 +182,21 @@ function ToggleFlight(enable)
     return true
 end
 
+-- Fly Toggle unter Noclip Toggle
 Tab1:AddToggle({
-    Name = "✈️ Player Fly",
+    Name = "⚫ Player Fly",
     Default = false,
     Callback = function(Value)
         local success = ToggleFlight(Value)
         if not success then
-            OrionLib:MakeNotification({
-                Name = "Samuel Fly",
-                Content = "Cannot fly while in vehicle!",
-                Time = 3
-            })
-        else
-            OrionLib:MakeNotification({
-                Name = "Samuel Fly",
-                Content = Value and "Flight Enabled" or "Flight Disabled",
-                Time = 2
-            })
+            warn("Fliegen konnte nicht aktiviert werden, weil du im Auto sitzt.")
+            Tab1:Refresh() -- Optional: GUI aktualisieren wenn Toggle nicht möglich
         end
     end
 })
 
-Tab1:AddSlider({
-    Name = "⚡ Fly Speed",
-    Min = 20,
-    Max = 200,
-    Default = 50,
-    Color = Color3.fromRGB(0, 255, 120),
-    Increment = 5,
-    ValueName = "Speed",
-    Callback = function(Value)
-        FlightSpeed = Value
-    end
-})
-
--- Section: Protection
-Tab1:AddSection({
-    Name = "🛡️ Protection"
-})
-
+-- Anti-Fall/Damage Funktion
+local RunService = game:GetService("RunService")
 local antiFallEnabled = false
 local antiFallConnection = nil
 
@@ -291,25 +232,25 @@ function AntiFallFunction(Value)
 end
 
 Tab1:AddToggle({
-    Name = "🪂 Anti-Fall/Damage",
+    Name = "⚫ Anti-Fall/Damage",
     Default = false,
     Callback = function(Value)
         AntiFallFunction(Value)
-        OrionLib:MakeNotification({
-            Name = "Samuel Protection",
-            Content = Value and "Anti-Fall Enabled" or "Anti-Fall Disabled",
-            Time = 2
-        })
     end
 })
 
--- Anti-Taser
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+-- Variablen
 local player = Players.LocalPlayer
 local AntiTaserEnabled = false
 local antiTaserConnections = {}
 local NORMAL_WALKSPEED = 20
 local charAddedConnection
 
+-- Disconnect Funktion
 local function disconnectAntiTaser()
     for _, c in ipairs(antiTaserConnections) do
         if c and c.Disconnect then
@@ -324,6 +265,7 @@ local function disconnectAntiTaser()
     end
 end
 
+-- Setup Funktion
 local function setupAntiTaserForCharacter(char)
     disconnectAntiTaser()
     if not char then return end
@@ -336,6 +278,7 @@ local function setupAntiTaserForCharacter(char)
         if not humanoid then return end
     end
 
+    -- Verhindert Taser-Effekte
     table.insert(antiTaserConnections, humanoid.StateChanged:Connect(function(_, new)
         if new == Enum.HumanoidStateType.PlatformStanding or new == Enum.HumanoidStateType.Physics then
             pcall(function()
@@ -345,6 +288,7 @@ local function setupAntiTaserForCharacter(char)
         end
     end))
 
+    -- Fix Heartbeat Loop
     table.insert(antiTaserConnections, RunService.Heartbeat:Connect(function()
         if not humanoid.Parent then return end
         if humanoid.PlatformStand then
@@ -359,14 +303,22 @@ local function setupAntiTaserForCharacter(char)
     end))
 end
 
+
+-- Kategorie / Section 1
+Tab1:AddSection({
+    Name = "Taser"
+})
+
+-- Toggle im UI
 Tab1:AddToggle({
-    Name = "⚡ Anti-Taser",
+    Name = "⚫ Anti-Taser",
     Default = false,
     Callback = function(Value)
         AntiTaserEnabled = Value
         if AntiTaserEnabled then
             setupAntiTaserForCharacter(player.Character or player.CharacterAdded:Wait())
 
+            -- Nur eine Verbindung erlauben
             if not charAddedConnection then
                 charAddedConnection = player.CharacterAdded:Connect(function(newChar)
                     task.wait(0.8)
@@ -375,32 +327,26 @@ Tab1:AddToggle({
                     end
                 end)
             end
-            OrionLib:MakeNotification({
-                Name = "Samuel Anti-Taser",
-                Content = "Anti-Taser Enabled",
-                Time = 3
-            })
         else
             disconnectAntiTaser()
-            OrionLib:MakeNotification({
-                Name = "Samuel Anti-Taser",
-                Content = "Anti-Taser Disabled",
-                Time = 3
-            })
         end
     end
 })
 
--- Auto Taser
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+
 local REMOTE_FOLDER = "Bnl"
 local REMOTE_ID = "c6011f40-2809-4686-a297-33283dd11715"
 local AUTO_TASER_INTERVAL = 0.5
 local MAX_TASE_RANGE = 80
-local autoEnabled = false
-local lastTase = 0
+
 
 local function getTaserPosition()
-    local char = Players.LocalPlayer.Character
+    local char = LocalPlayer.Character
     if not char then return nil, nil end
     local taser = char:FindFirstChild("Taser")
     if taser then
@@ -426,7 +372,7 @@ local function findNearestEnemy(maxRange)
     local taserPos = pos
     local nearestPlayer, nearestDist
     for _, pl in ipairs(Players:GetPlayers()) do
-        if pl ~= Players.LocalPlayer and pl.Team ~= Players.LocalPlayer.Team then
+        if pl ~= LocalPlayer and pl.Team ~= LocalPlayer.Team then
             local char = pl.Character
             local humanoid = char and char:FindFirstChildOfClass("Humanoid")
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
@@ -472,6 +418,9 @@ local function fireTaserAtTarget()
     end
 end
 
+local autoEnabled = false
+local lastTase = 0
+
 RunService.RenderStepped:Connect(function()
     if autoEnabled and tick() - lastTase >= AUTO_TASER_INTERVAL then
         fireTaserAtTarget()
@@ -480,78 +429,116 @@ RunService.RenderStepped:Connect(function()
 end)
 
 Tab1:AddToggle({
-    Name = "🔫 Auto Taser",
+    Name = "⚫ Auto Taser",
     Default = false,
     Callback = function(Value)
         autoEnabled = Value
-        OrionLib:MakeNotification({
-            Name = "Samuel Auto Taser",
-            Content = Value and "Auto Taser Enabled" or "Auto Taser Disabled",
-            Time = 3
-        })
-    end
-})
-
--- Section: Extras
-Tab1:AddSection({
-    Name = "⚡ Extras"
-})
-
-Tab1:AddButton({
-    Name = "🚗 Jump from Vehicle",
-    Callback = function()
-        local character = player.Character
-        if character then
-            local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then
-                humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                OrionLib:MakeNotification({
-                    Name = "Samuel Vehicle",
-                    Content = "Jumped from vehicle!",
-                    Time = 2
-                })
-            end
-        end
-    end
-})
-
-Tab1:AddButton({
-    Name = "🔄 Reset Character",
-    Callback = function()
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.Health = 0
+        if Value then
             OrionLib:MakeNotification({
-                Name = "Samuel Reset",
-                Content = "Character reset!",
+                Name = "Auto Taser Enabled",
+                Content = "Automatic tasing is now active.",
+                Time = 2
+            })
+        else
+            OrionLib:MakeNotification({
+                Name = "Auto Taser Disabled",
+                Content = "Automatic tasing has been stopped.",
                 Time = 2
             })
         end
-    end    
+    end
+})
+--------------------------------------------------------
+
+----------------------------------------------------------------------
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+
+local noclipEnabled = false
+local noclipConnection = nil
+local function SetNoclipMode(enable)
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not enable
+        end
+    end
+end
+
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    if noclipEnabled then
+        SetNoclipMode(true)
+    end
+end)
+
+
+player.CharacterAdded:Connect(function()
+    wait(0.1)
+    character, humanoid = getCharacter()
+end)
+
+
+
+
+local button = script.Parent
+local player = game.Players.LocalPlayer -- Oyuncu
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+-- Kategorie / Section 1
+Tab1:AddSection({
+    Name = "Extra"
 })
 
--- Jump Power
+Tab1:AddButton({
+    Name = "⚫ Jump from Vehicle/Seat",
+    Callback = function()
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+})
+
+Tab1:AddButton({
+	Name = "⚫ Reset Character",
+	Callback = function()
+		local player = game.Players.LocalPlayer
+		local character = player.Character or player.CharacterAdded:Wait()
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			humanoid.Health = 0
+		end
+	end    
+})
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function()
+        if isEnemy(player) then
+            wait(0.1)
+        end
+    end)
+end)
+
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
-local jumpBoostPower = 0
+local jumpBoostPower = 350
 
 Tab1:AddSlider({
-    Name = "🦘 Jump Power",
+    Name = "⚫ Jump Power",
     Min = 0,
     Max = 350,
     Default = 0,
-    Color = Color3.fromRGB(255, 100, 0),
-    Increment = 10,
+    Color = Color3.fromRGB(69,64,64),
+    Increment = 1,
     ValueName = "Power",
     Callback = function(Value)
         jumpBoostPower = Value
-        OrionLib:MakeNotification({
-            Name = "Samuel Jump",
-            Content = "Jump Power: " .. tostring(Value),
-            Time = 2
-        })
     end    
 })
 
@@ -565,23 +552,49 @@ humanoid.Jumping:Connect(function()
     end
 end)
 
+
 -- Charakter beim Join / Respawn setzen
 Players.LocalPlayer.CharacterAdded:Connect(setCharacter)
 if Players.LocalPlayer.Character then
     setCharacter(Players.LocalPlayer.Character)
 end
 
--- ===========================
--- CAR TAB (Enhanced GUI)
--- ===========================
 local Tab2 = Window:MakeTab({
-    Name = "🚗│Vehicle",
-    Icon = "rbxassetid://7733960981"
+	Name = "🛺│Car Fly",
+	PremiumOnly = false
 })
 
+-- Kategorie / Section 1
 Tab2:AddSection({
-    Name = "🚀 Vehicle Flight"
+    Name = "Fly"
 })
+
+local player = game.Players.LocalPlayer
+local button = script.Parent
+
+local function teleportToVehicle()
+	local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
+	
+	if vehicle then
+		if vehicle:FindFirstChild("Body") and vehicle.Body:FindFirstChild("Mass") then
+			vehicle.PrimaryPart = vehicle.Body.Mass
+		end
+
+		local character = player.Character
+		if character and character:FindFirstChild("HumanoidRootPart") then
+			local targetLocation = character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -10)
+			vehicle:PivotTo(targetLocation)
+		end
+
+		local driveSeat = vehicle:FindFirstChild("DriveSeat")
+		if driveSeat and driveSeat:IsA("VehicleSeat") then
+			driveSeat:Sit(character.Humanoid)
+		end
+	end
+end
+
+--------------------------------------------------------
+
 
 local flightGuiEnabled = false
 local flightEnabled = false
@@ -597,7 +610,7 @@ local buttonDirections = {
 
 local function createFlightGui()
     local screenGui = Instance.new("ScreenGui", game.Players.LocalPlayer.PlayerGui)
-    screenGui.Name = "SamuelFlightControl"
+    screenGui.Name = "FlightControlGui"
     screenGui.Enabled = false
 
     local frame = Instance.new("Frame", screenGui)
@@ -606,6 +619,8 @@ local function createFlightGui()
     frame.Size = UDim2.new(0, 200, 0, 200)
     frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
     frame.BackgroundTransparency = 0.2
+    local drag = Instance.new("UIDragDetector", frame)
+
     local uiCorner = Instance.new("UICorner", frame)
     uiCorner.CornerRadius = UDim.new(0.1, 0)
 
@@ -664,44 +679,24 @@ local function toggleFlightGui(Value)
     flightGuiEnabled = Value
 end
 
+-- Define UserInputService
+local UserInputService = game:GetService("UserInputService")
+
+
 Tab2:AddToggle({
-    Name = "🚀 Car Fly",
+    Name = "🟢 Car Fly (Nicht Hoch Fligen)",
     Default = false,
     Callback = function(Value)
         flightEnabled = Value
-        OrionLib:MakeNotification({
-            Name = "Samuel Car Fly",
-            Content = Value and "Car Fly Enabled" or "Car Fly Disabled",
-            Time = 2
-        })
     end
 })
 
 Tab2:AddToggle({
-    Name = "📱 Mobile Fly Menu",
+    Name = "🟢 Mobile Fly Menu",
     Default = false,
     Callback = function(Value)
         toggleFlightGui(Value)
-        OrionLib:MakeNotification({
-            Name = "Samuel Flight Menu",
-            Content = Value and "Mobile Menu Enabled" or "Mobile Menu Disabled",
-            Time = 2
-        })
     end
-})
-
-Tab2:AddBind({
-    Name = "🔑 Car Fly Keybind",
-    Default = Enum.KeyCode.X,
-    Hold = false,
-    Callback = function()
-        flightEnabled = not flightEnabled
-        OrionLib:MakeNotification({
-            Name = "Samuel Car Fly",
-            Content = flightEnabled and "Car Fly Enabled" or "Car Fly Disabled",
-            Time = 2
-        })
-    end   
 })
 
 -- Render step for movement
@@ -737,40 +732,354 @@ game:GetService("RunService").RenderStepped:Connect(function()
                 end
             end
         end
+    else
+        if Character then
+            Character.Parent = defaultCharacterParent or Character.Parent
+            defaultCharacterParent = Character.Parent
+        end
     end
 end)
 
--- Section: Vehicle Mods
-Tab2:AddSection({
-    Name = "🔧 Vehicle Mods"
+Tab2:AddBind({
+    Name = "🟢 Car fly Keybind",
+    Default = Enum.KeyCode.X,
+    Hold = false,
+    Callback = function()
+        flightEnabled = not flightEnabled
+        toggleCarFlyButton:Set(flightEnabled)
+    end   
 })
 
-local VehiclesFolder = workspace:WaitForChild("Vehicles")
-local rainbowAktiv = false
-local fahrzeugColor = Color3.fromRGB(255, 255, 255)
 
-local function applyColorToVehicle(color)
-    local vehicle = VehiclesFolder:FindFirstChild(Players.LocalPlayer.Name)
-    if vehicle and vehicle:IsA("Model") then
-        for _, part in ipairs(vehicle:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Color = color
-                part.Material = Enum.Material.SmoothPlastic
-            end
+------------------------------
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+local VehiclesFolder = Workspace:WaitForChild("Vehicles")
+
+local function onSliderValueChanged(value)
+    local playerVehicle = VehiclesFolder:FindFirstChild(LocalPlayer.Name)
+    if playerVehicle and playerVehicle:IsA("Model") and playerVehicle:GetAttribute("MaxAccelerateForce") ~= nil then
+        playerVehicle:SetAttribute("MaxAccelerateForce", value)
+    end
+end
+
+VehiclesFolder.ChildAdded:Connect(function(child)
+    if child.Name == LocalPlayer.Name and child:IsA("Model") then
+    end
+end)
+
+VehiclesFolder.ChildRemoved:Connect(function(child)
+    if child.Name == LocalPlayer.Name then
+    end
+end)
+
+
+ -----------------------------------------------------
+ local function onSliderValueChanged(value)
+    local playerVehicle = VehiclesFolder:FindFirstChild(LocalPlayer.Name)
+    if playerVehicle and playerVehicle:IsA("Model") and playerVehicle:GetAttribute("ReverseMaxSpeed") ~= nil then
+        playerVehicle:SetAttribute("ReverseMaxSpeed", value)
+    end
+end
+
+VehiclesFolder.ChildAdded:Connect(function(child)
+    if child.Name == LocalPlayer.Name and child:IsA("Model") then
+    end
+end)
+
+VehiclesFolder.ChildRemoved:Connect(function(child)
+    if child.Name == LocalPlayer.Name then
+    end
+end)
+
+ -----------------------------------------------------
+ local function onSliderValueChanged(value)
+    local playerVehicle = VehiclesFolder:FindFirstChild(LocalPlayer.Name)
+    if playerVehicle and playerVehicle:IsA("Model") and playerVehicle:GetAttribute("MaxSpeed") ~= nil then
+        playerVehicle:SetAttribute("MaxSpeed", value)
+    end
+end
+
+VehiclesFolder.ChildAdded:Connect(function(child)
+    if child.Name == LocalPlayer.Name and child:IsA("Model") then
+    end
+end)
+
+VehiclesFolder.ChildRemoved:Connect(function(child)
+    if child.Name == LocalPlayer.Name then
+    end
+end)
+
+------------------------------------------------
+ local function onSliderValueChanged(value)
+    local playerVehicle = VehiclesFolder:FindFirstChild(LocalPlayer.Name)
+    if playerVehicle and playerVehicle:IsA("Model") and playerVehicle:GetAttribute("MaxBrakeForce") ~= nil then
+        playerVehicle:SetAttribute("MaxBrakeForce", value)
+    end
+end
+
+VehiclesFolder.ChildAdded:Connect(function(child)
+    if child.Name == LocalPlayer.Name and child:IsA("Model") then
+    end
+end)
+
+VehiclesFolder.ChildRemoved:Connect(function(child)
+    if child.Name == LocalPlayer.Name then
+    end
+end)
+
+
+-----------------------------------------------------------
+local lplr = game:GetService("Players").LocalPlayer
+
+local settings = {
+    fuelcapacity = false,
+    inffual = false,
+    godcar = false,
+
+}
+task.defer(function()
+    while task.wait() do
+        if settings.inffual then
+            workspace.Vehicles[lplr.Name]:SetAttribute("CurrentFuel", math.huge)
+        end
+    end
+end)
+
+
+
+task.defer(function()
+    while task.wait() do
+        if settings.fuelcapacity then
+            workspace.Vehicles[lplr.Name]:SetAttribute("IsOn", true)
+        end
+    end
+end)
+
+
+
+--god car
+task.defer(function()
+    while task.wait() do
+        if settings.godcar then
+            workspace.Vehicles[lplr.Name]:SetAttribute("CurrentHealth", math.huge)
+        end
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = workspace.CurrentCamera
+local Player = Players.LocalPlayer
+
+local Flying = false
+local FlightSpeed = 60
+local Acceleration = 10
+local SpeedKey = Enum.KeyCode.LeftControl
+local SpeedKeyMultiplier = 3
+local CurrentVelocity = Vector3.zero
+local CarModel = nil
+local Connection = nil
+
+local Keys = {
+	W = false,
+	S = false,
+	A = false,
+	D = false
+}
+
+UserInputService.InputBegan:Connect(function(input, gpe)
+	if gpe then return end
+	if input.KeyCode == Enum.KeyCode.W then Keys.W = true end
+	if input.KeyCode == Enum.KeyCode.S then Keys.S = true end
+	if input.KeyCode == Enum.KeyCode.A then Keys.A = true end
+	if input.KeyCode == Enum.KeyCode.D then Keys.D = true end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.W then Keys.W = false end
+	if input.KeyCode == Enum.KeyCode.S then Keys.S = false end
+	if input.KeyCode == Enum.KeyCode.A then Keys.A = false end
+	if input.KeyCode == Enum.KeyCode.D then Keys.D = false end
+end)
+
+local function findVehicleModel()
+	local char = Player.Character or Player.CharacterAdded:Wait()
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("Seat") or v:IsA("VehicleSeat") then
+			if v.Occupant and v.Occupant.Parent == char then
+				local model = v:FindFirstAncestorOfClass("Model")
+				if model then
+					if not model.PrimaryPart then
+						local base = model:FindFirstChild("PrimaryPart") or model:FindFirstChildWhichIsA("BasePart")
+						if base then
+							model.PrimaryPart = base
+						else
+							warn("Kein PrimaryPart gefunden im Fahrzeug!")
+							return nil
+						end
+					end
+					return model
+				end
+			end
+		end
+	end
+
+	warn("Du sitzt in keinem Sitz, oder Sitz ist nicht in einem Model.")
+	return nil
+end
+
+
+local function driveStep(dt)
+	if not CarModel or not CarModel.PrimaryPart then return end
+
+	local direction = Vector3.zero
+	if Keys.W then direction += Camera.CFrame.LookVector end
+	if Keys.S then direction -= Camera.CFrame.LookVector end
+	if Keys.A then direction -= Camera.CFrame.RightVector end
+	if Keys.D then direction += Camera.CFrame.RightVector end
+
+	direction = Vector3.new(direction.X, 0, direction.Z)
+
+	local speed = FlightSpeed
+	if UserInputService:IsKeyDown(SpeedKey) then
+		speed = speed * SpeedKeyMultiplier
+	end
+
+	local targetVelocity = direction.Magnitude > 0 and direction.Unit * speed or Vector3.zero
+	CurrentVelocity = CurrentVelocity:Lerp(targetVelocity, math.clamp(dt * Acceleration, 0, 1))
+
+	local root = CarModel.PrimaryPart
+	local pos = root.Position
+
+	local newCF
+	if CurrentVelocity.Magnitude > 1 then
+		local lookAt = pos + Vector3.new(CurrentVelocity.X, 0, CurrentVelocity.Z)
+		local targetCF = CFrame.new(pos, lookAt)
+
+		newCF = root.CFrame:Lerp(CFrame.new(pos + CurrentVelocity * dt, lookAt), 0.15)
+	else
+		newCF = root.CFrame + CurrentVelocity * dt
+	end
+
+	CarModel:PivotTo(newCF)
+end
+
+local function ToggleCarSteal(state)
+	Flying = state
+	if Flying then
+		CarModel = findVehicleModel()
+		if not CarModel then
+			warn("Kein Fahrzeug gefunden! Setz dich zuerst auf einen Sitz.")
+			return
+		end
+		Connection = RunService.Heartbeat:Connect(driveStep)
+	else
+		if Connection then Connection:Disconnect() end
+		Connection = nil
+	end
+end
+
+local function ensurePlayerInVehicle()
+    local vehicle = workspace:FindFirstChild("Vehicles") and workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
+
+    if vehicle and character then
+        local humanoid = character:FindFirstChildWhichIsA("Humanoid")
+        local driveSeat = vehicle:FindFirstChild("DriveSeat")
+
+        if humanoid and driveSeat and humanoid.SeatPart ~= driveSeat then
+            driveSeat:Sit(humanoid)
         end
     end
 end
 
-local function getRainbowColor(t, speed)
-    local hue = (t % (speed or 5)) / (speed or 5)
-    return Color3.fromHSV(hue, 1, 1)
+-- Variablen
+local player = game.Players.LocalPlayer
+local vehicle = workspace:WaitForChild("Vehicles"):FindFirstChild(player.Name)
+local rainbowSpeed = 5
+local rainbowAktiv = false
+local fahrzeugColor = Color3.fromRGB(255, 255, 255)
+local FlightSpeed = 50
+
+local kennzeichenText = "Samuel"
+local frontPlateColor = Color3.fromRGB(000, 000, 000)
+local backPlateColor = Color3.fromRGB(000, 000, 000)
+
+-- Funktionen
+local function getRainbowColor(t)
+	local hue = (t % rainbowSpeed) / rainbowSpeed
+	return Color3.fromHSV(hue, 1, 1)
 end
 
+local function applyColorToVehicle(color)
+	if vehicle and vehicle:IsA("Model") then
+		for _, part in ipairs(vehicle:GetDescendants()) do
+			if part:IsA("BasePart") then
+				part.Color = color
+				part.Material = Enum.Material.SmoothPlastic
+			end
+		end
+	end
+end
+
+local function startRainbow()
+	task.spawn(function()
+		while rainbowAktiv do
+			if vehicle then
+				applyColorToVehicle(getRainbowColor(tick()))
+			end
+			task.wait(0.1)
+		end
+	end)
+end
+
+
+
+-- defensive checks + Debug helper
+local function safePrint(...)
+    if typeof(print) == "function" then
+        print("[CarMod] ", ...)
+    end
+end
+
+local function safeCall(fn, ...)
+    if type(fn) ~= "function" then
+        safePrint("safeCall: versucht non-function aufzurufen")
+        return false
+    end
+    local ok, res = pcall(fn, ...)
+    if not ok then
+        safePrint("Fehler in safeCall:", res)
+    end
+    return ok, res
+end
+
+-- check Window
+if typeof(Window) ~= "table" and typeof(Window) ~= "userdata" then
+    safePrint("Fehler: 'Window' ist nil oder nicht vorhanden. Make sure the UI library is loaded.")
+    return
+end
+
+-- Kategorie / Section 1
+Tab2:AddSection({
+    Name = "Exsta"
+})
+
+
+local lplr = game:GetService("Players").LocalPlayer
+
+local lplr = game:GetService("Players").LocalPlayer
+
 Tab2:AddButton({
-    Name = "🛡️ Car God Mode",
-    Callback = function()
+	Name = "🟢 CarGod",
+	Callback = function()
         local vehicleGodMode = true  
         local lastVehicle = nil
+        
         
         local function updateVehicle()
             if not vehicleGodMode then return end
@@ -786,82 +1095,49 @@ Tab2:AddButton({
             end
         end
         
-        RunService.Heartbeat:Connect(updateVehicle)
-        OrionLib:MakeNotification({
-            Name = "Samuel Car God",
-            Content = "Car God Mode Activated!",
-            Time = 3
-        })
+        RunService.Heartbeat:Connect(updateVehicle) 
   	end
 })
 
 Tab2:AddButton({
-    Name = "📍 Teleport to Vehicle",
-    Callback = function()
-        local function ensurePlayerInVehicle()
-            local vehicle = workspace:FindFirstChild("Vehicles") and workspace.Vehicles:FindFirstChild(Players.LocalPlayer.Name)
-            local character = Players.LocalPlayer.Character
-
-            if vehicle and character then
-                local humanoid = character:FindFirstChildWhichIsA("Humanoid")
-                local driveSeat = vehicle:FindFirstChild("DriveSeat")
-
-                if humanoid and driveSeat and humanoid.SeatPart ~= driveSeat then
-                    driveSeat:Sit(humanoid)
-                    OrionLib:MakeNotification({
-                        Name = "Samuel Vehicle",
-                        Content = "Teleported to vehicle!",
-                        Time = 3
-                    })
-                end
-            end
-        end
-        ensurePlayerInVehicle()
+	Name = "🟢 Stel my Vehicle",
+	Callback = function()
+		ensurePlayerInVehicle()
   	end    
 })
 
 Tab2:AddToggle({
-    Name = "🌈 Rainbow Vehicle",
-    Default = false,
-    Callback = function(Value)
-        rainbowAktiv = Value
-        if rainbowAktiv then
-            task.spawn(function()
-                while rainbowAktiv do
-                    if VehiclesFolder:FindFirstChild(Players.LocalPlayer.Name) then
-                        applyColorToVehicle(getRainbowColor(tick(), 5))
-                    end
-                    task.wait(0.1)
-                end
-            end)
-            OrionLib:MakeNotification({
-                Name = "Samuel Rainbow",
-                Content = "Rainbow Vehicle Enabled!",
-                Time = 3
-            })
-        else
-            applyColorToVehicle(fahrzeugColor)
-            OrionLib:MakeNotification({
-                Name = "Samuel Rainbow",
-                Content = "Rainbow Vehicle Disabled",
-                Time = 3
-            })
-        end
-    end
+	Name = "🟢 🌈 Rainbow Fahrzeugfarbe",
+	Default = true,
+	Callback = function(Value)
+		rainbowAktiv = Value
+		if rainbowAktiv then
+			startRainbow()
+		else
+			applyColorToVehicle(fahrzeugColor)
+		end
+	end
 })
 
--- Section: Speed Boost
+-- Kategorie / Section 1
 Tab2:AddSection({
-    Name = "⚡ Speed Boost"
+    Name = "Speed Boost"
 })
 
+-- Services
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- State Variablen
 local boostEnabled = false
 local boostConnection = nil
-local speedValue = 30
+local speedValue = 30 -- default studs/sec
 local healthConn = nil
 local originalMaxHealth = nil
 local humanoidRef = nil
 
+-- === Helpers ===
 local function getCharacterParts()
     if not player.Character then return nil end
     local char = player.Character
@@ -870,6 +1146,7 @@ local function getCharacterParts()
     return char, humanoid, hrp
 end
 
+-- === Speed Boost Logic ===
 local function startBoostEnforcer()
     if boostConnection then return end
     boostConnection = RunService.RenderStepped:Connect(function()
@@ -877,13 +1154,16 @@ local function startBoostEnforcer()
         local char, humanoid, hrp = getCharacterParts()
         if not hrp or not hrp.Parent then return end
 
+        -- aktuelle Geschwindigkeit holen
         local vel = hrp.AssemblyLinearVelocity
         if type(vel) ~= "Vector3" then vel = hrp.Velocity end
 
+        -- nur boosten, wenn Spieler schon > 5 s/s nach vorn will
         local forward = hrp.CFrame.LookVector
-        local fwdSpeed = vel:Dot(forward)
-        if fwdSpeed < 5 then return end
+        local fwdSpeed = vel:Dot(forward)   -- Komponente in Blickrichtung
+        if fwdSpeed < 5 then return end     -- Stillstand → nichts tun
 
+        -- Y-Komponente erhalten (Sprung etc.)
         local desired = Vector3.new(forward.X * speedValue, vel.Y, forward.Z * speedValue)
         pcall(function()
             hrp.AssemblyLinearVelocity = desired
@@ -898,6 +1178,7 @@ local function stopBoostEnforcer()
     end
 end
 
+-- === No Damage Logic ===
 local function enableNoDamage()
     if healthConn then
         pcall(function() healthConn:Disconnect() end)
@@ -937,6 +1218,7 @@ local function disableNoDamage()
     originalMaxHealth = nil
 end
 
+-- === Combined Toggle ===
 local function enableSafeSpeedBoost(val)
     boostEnabled = val
     if val then
@@ -948,6 +1230,7 @@ local function enableSafeSpeedBoost(val)
     end
 end
 
+-- Respawn Handler
 player.CharacterAdded:Connect(function()
     task.wait(0.3)
     if boostEnabled then
@@ -956,21 +1239,21 @@ player.CharacterAdded:Connect(function()
 end)
 
 Tab2:AddToggle({
-    Name = "⚡ Speed Boost (Safe)",
+    Name = "🟢 Speed Boost (Safe Mode)",
     Default = false,
     Callback = function(Value)
         enableSafeSpeedBoost(Value)
         if Value then
             OrionLib:MakeNotification({
-                Name = "Samuel Boost",
-                Content = "Speed Boost + No Damage Enabled!",
+                Name = "Boost aktiviert",
+                Content = "Safe Boost + NoDamage aktiv!",
                 Image = "rbxassetid://4483345998",
                 Time = 3
             })
         else
             OrionLib:MakeNotification({
-                Name = "Samuel Boost",
-                Content = "Speed Boost Disabled",
+                Name = "Boost deaktiviert",
+                Content = "Boost + NoDamage aus.",
                 Image = "rbxassetid://4483345998",
                 Time = 3
             })
@@ -979,17 +1262,17 @@ Tab2:AddToggle({
 })
 
 Tab2:AddSlider({
-    Name = "📈 Boost Speed",
+    Name = "🟢 Boost Speed",
     Min = 0,
     Max = 300,
     Default = speedValue,
-    Color = Color3.fromRGB(0, 255, 120),
+    Color = Color3.fromRGB(0,255,120),
     Increment = 5,
     ValueName = "km/h",
     Callback = function(value)
         speedValue = math.floor(tonumber(value) or speedValue)
         OrionLib:MakeNotification({
-            Name = "Samuel Speed",
+            Name = "Speed geändert",
             Content = "Boost Speed: " .. tostring(speedValue),
             Image = "rbxassetid://4483345998",
             Time = 2
@@ -997,198 +1280,349 @@ Tab2:AddSlider({
     end
 })
 
+
 Tab2:AddSlider({ 
-    Name = "🚀 Car Fly Speed", 
+    Name = "🟢 Car Fly Speed //over 70 for a not god PC", 
     Min = 10,
     Max = 450, 
     Default = (flightSpeed * 60),
-    Color = Color3.fromRGB(0, 255, 120),
+    Color = Color3.fromRGB(0,255,120),
     Increment = 10,
     ValueName = "Speed", 
     Callback = function(Value)
         flightSpeed = (Value / 50)
-        OrionLib:MakeNotification({
-            Name = "Samuel Fly Speed",
-            Content = "Car Fly Speed: " .. tostring(Value),
-            Time = 2
-        })
     end 
 })
 
--- ===========================
--- TELEPORT TAB (Enhanced GUI)
--- ===========================
-local Tab3 = Window:MakeTab({
-    Name = "📍│Teleport",
-    Icon = "rbxassetid://7733685921"
-})
 
-Tab3:AddSection({
-    Name = "📍 Quick Teleports"
+local Tab3 = Window:MakeTab({
+	Name = "🌀│Teleport",
+	PremiumOnly = false
 })
 
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 
-_G.flightSpeed = 190
+_G.flightSpeed = 190 -- Default speed
+
+-----------------------------------------------
+-----------------------------------------------
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
 
 local minSpeed = 170
 local maxSpeed = 240
+
+-- FPS ölçümü
 local fps = 60
-
 RunService.RenderStepped:Connect(function(deltaTime)
-    fps = math.floor(1 / deltaTime)
+	fps = math.floor(1 / deltaTime)
 end)
 
+-- Ping (RTT) ölçümü (ms cinsinden)
 local function getPing()
-    local dataPing = game:GetService("Stats"):FindFirstChild("Network"):FindFirstChild("Ping")
-    if dataPing then
-        return dataPing:GetValue()
-    end
-    return 100
+	local dataPing = Stats:FindFirstChild("Network"):FindFirstChild("Ping")
+	if dataPing then
+		return dataPing:GetValue()
+	end
+	return 100 -- varsayılan ping
 end
 
+-- Uçuş hızını güncelle
 task.spawn(function()
-    while true do
-        local currentPing = getPing()
-        local pingFactor = math.clamp(1 - (currentPing / 300), 0, 1)
-        local fpsFactor = math.clamp(fps / 60, 0.5, 1.2)
-        local adjustedSpeed = math.clamp(minSpeed * fpsFactor * pingFactor, minSpeed, maxSpeed)
-        _G.flightSpeed = math.floor(adjustedSpeed)
-        task.wait(1)
-    end
-end)
+	while true do
+		local currentPing = getPing()
+		local pingFactor = math.clamp(1 - (currentPing / 300), 0, 1) -- yüksek ping = yavaşlat
 
+		local fpsFactor = math.clamp(fps / 60, 0.5, 1.2) -- düşük fps = yavaşlat
+
+		local adjustedSpeed = math.clamp(minSpeed * fpsFactor * pingFactor, minSpeed, maxSpeed)
+
+		_G.flightSpeed = math.floor(adjustedSpeed)
+
+		task.wait(1) -- her saniye bir kez kontrol et
+	end
+end)
+-----------------------------------------------
+-----------------------------------------------
+
+-- Modelin 'PrimaryPart'ını ayarlama fonksiyonu
 local function setPrimaryPart(vehicleModel)
-    local body = vehicleModel:FindFirstChild("Body")
-    if body then
-        local mass = body:FindFirstChild("Mass")
-        if mass then
-            vehicleModel.PrimaryPart = mass
-            return mass
-        else
-            warn("Body modelinin içinde 'Mass' parçası bulunamadı.")
-        end
-    else
-        warn("Araç modelinde 'Body' modeli bulunamadı.")
-    end
-    return nil
+	local body = vehicleModel:FindFirstChild("Body")
+	if body then
+		local mass = body:FindFirstChild("Mass")
+		if mass then
+			vehicleModel.PrimaryPart = mass
+			return mass
+		else
+			warn("Body modelinin içinde 'Mass' parçası bulunamadı.")
+		end
+	else
+		warn("Araç modelinde 'Body' modeli bulunamadı.")
+	end
+	return nil
 end
 
+-- Sabit hızla tween yapmak için fonksiyon
+local function createTween(targetInstance, startCFrame, endCFrame, speed)
+	local distance = (endCFrame.Position - startCFrame.Position).Magnitude
+	local duration = distance / speed
+
+	local tweenInfo = TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut)
+	local tweenValue = Instance.new("CFrameValue")
+	tweenValue.Value = startCFrame
+
+	tweenValue.Changed:Connect(function()
+		if targetInstance:IsA("Model") then
+			targetInstance:PivotTo(tweenValue.Value)
+		else
+			targetInstance.CFrame = tweenValue.Value
+		end
+	end)
+
+	local tween = TweenService:Create(tweenValue, tweenInfo, {Value = endCFrame})
+	tween:Play()
+	return tween
+end
+
+-- frameTween(CFrame.new(...)) şeklinde kullanım
 function frameTween(targetCFrame)
+	local character = player.Character or player.CharacterAdded:Wait()
+	local humanoid = character:FindFirstChildOfClass("Humanoid")
+	if not humanoid then return end
+
+	local vehiclesFolder = workspace:FindFirstChild("Vehicles")
+	if not vehiclesFolder then
+		warn("Vehicles klasörü bulunamadı.")
+		return
+	end
+
+	local vehicle = vehiclesFolder:FindFirstChild(player.Name)
+	if not vehicle then
+		warn("Oyuncuya ait araç bulunamadı.")
+		return
+	end
+
+	local driveSeat = vehicle:FindFirstChild("DriveSeat")
+	if not driveSeat or not driveSeat:IsA("Seat") then
+		warn("DriveSeat bulunamadı veya uygun değil.")
+		return
+	end
+
+	if not vehicle.PrimaryPart then
+		local body = vehicle:FindFirstChild("Body")
+		if body then
+			local mass = body:FindFirstChild("Mass")
+			if mass then
+				vehicle.PrimaryPart = mass
+			else
+				warn("Body içinde 'Mass' bulunamadı.")
+				return
+			end
+		else
+			warn("Araç içinde 'Body' bulunamadı.")
+			return
+		end
+	end
+
+	driveSeat:Sit(humanoid)
+	task.wait(0.1)
+
+	local originalProps = {}
+	for _, part in pairs(vehicle:GetDescendants()) do
+		if part:IsA("BasePart") then
+			originalProps[part] = {
+				Velocity = part.Velocity,
+				RotVelocity = part.RotVelocity,
+				AssemblyLinearVelocity = part.AssemblyLinearVelocity,
+				AssemblyAngularVelocity = part.AssemblyAngularVelocity
+			}
+			part.Velocity = Vector3.zero
+			part.RotVelocity = Vector3.zero
+			part.AssemblyLinearVelocity = Vector3.zero
+			part.AssemblyAngularVelocity = Vector3.zero
+		end
+	end
+
+	local function createTween(startCF, endCF)
+		local distance = (endCF.Position - startCF.Position).Magnitude
+		local duration = distance / _G.flightSpeed
+
+		local cframe = Instance.new("CFrameValue")
+		cframe.Value = startCF
+
+		cframe.Changed:Connect(function()
+			if vehicle.PrimaryPart then
+				vehicle:SetPrimaryPartCFrame(cframe.Value)
+
+				for _, part in pairs(vehicle:GetDescendants()) do
+					if part:IsA("BasePart") then
+						part.Velocity = Vector3.zero
+						part.RotVelocity = Vector3.zero
+						part.AssemblyLinearVelocity = Vector3.zero
+						part.AssemblyAngularVelocity = Vector3.zero
+					end
+				end
+			end
+		end)
+
+		local tween = TweenService:Create(cframe, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+			Value = endCF
+		})
+
+		return tween, cframe
+	end
+
+	local function smoothMove(startCF, endCF)
+		local tween, cframe = createTween(startCF, endCF)
+		tween:Play()
+		tween.Completed:Wait()
+		cframe:Destroy()
+
+		if humanoid.SeatPart ~= driveSeat then
+			driveSeat:Sit(humanoid)
+			task.wait(0.1)
+		end
+	end
+
+	-- Sabit yükseklik belirle
+	local fixedY = 2.30769644
+
+	-- First move horizontally at fixed Y
+	local startCF = vehicle.PrimaryPart.CFrame
+	local fixedStart = CFrame.new(Vector3.new(startCF.Position.X, fixedY, startCF.Position.Z), startCF.LookVector + Vector3.new(0, 0, 1))
+	local fixedTarget = CFrame.new(Vector3.new(targetCFrame.Position.X, fixedY, targetCFrame.Position.Z), targetCFrame.LookVector + Vector3.new(0, 0, 1))
+
+	smoothMove(fixedStart, fixedTarget)
+
+	task.wait(0.2)
+
+	-- Then move to the actual target Y position
+	if math.abs(targetCFrame.Position.Y - fixedY) > 0.1 then
+		local finalTarget = CFrame.new(Vector3.new(targetCFrame.Position.X, targetCFrame.Position.Y, targetCFrame.Position.Z), targetCFrame.LookVector + Vector3.new(0, 0, 1))
+		smoothMove(fixedTarget, finalTarget)
+		task.wait(0.2)
+	end
+
+	for part, props in pairs(originalProps) do
+		if part and part.Parent then
+			part.Velocity = props.Velocity
+			part.RotVelocity = props.RotVelocity
+			part.AssemblyLinearVelocity = props.AssemblyLinearVelocity
+			part.AssemblyAngularVelocity = props.AssemblyAngularVelocity
+		end
+	end
+
+	vehicle:SetPrimaryPartCFrame(targetCFrame)
+	driveSeat:Sit(humanoid)
+
+end
+
+-- Gemeinsame Bewegungsfunktion
+local function moveVehicle(vehicle, targetCFrame)
+    if not vehicle or not targetCFrame then return end
+
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-    if not humanoid then return end
-
-    local vehiclesFolder = workspace:FindFirstChild("Vehicles")
-    if not vehiclesFolder then
-        warn("Vehicles klasörü bulunamadı.")
-        return
-    end
-
-    local vehicle = vehiclesFolder:FindFirstChild(player.Name)
-    if not vehicle then
-        warn("Oyuncuya ait araç bulunamadı.")
-        return
-    end
-
     local driveSeat = vehicle:FindFirstChild("DriveSeat")
-    if not driveSeat or not driveSeat:IsA("Seat") then
-        warn("DriveSeat bulunamadı veya uygun değil.")
-        return
-    end
 
-    if not vehicle.PrimaryPart then
-        local body = vehicle:FindFirstChild("Body")
-        if body then
-            local mass = body:FindFirstChild("Mass")
-            if mass then
-                vehicle.PrimaryPart = mass
-            else
-                warn("Body içinde 'Mass' bulunamadı.")
-                return
-            end
-        else
-            warn("Araç içinde 'Body' bulunamadı.")
-            return
-        end
-    end
-
+    if not driveSeat or not humanoid then return end
+    
+    -- Ensure we're in the vehicle
     driveSeat:Sit(humanoid)
     task.wait(0.1)
+    
+    -- Set primary part if needed
+    if not vehicle.PrimaryPart then
+        vehicle.PrimaryPart = driveSeat
+    end
 
-    local originalProps = {}
+    -- Store original properties
+    local originalProperties = {}
     for _, part in pairs(vehicle:GetDescendants()) do
         if part:IsA("BasePart") then
-            originalProps[part] = {
+            originalProperties[part] = {
                 Velocity = part.Velocity,
                 RotVelocity = part.RotVelocity,
                 AssemblyLinearVelocity = part.AssemblyLinearVelocity,
                 AssemblyAngularVelocity = part.AssemblyAngularVelocity
             }
-            part.Velocity = Vector3.zero
-            part.RotVelocity = Vector3.zero
-            part.AssemblyLinearVelocity = Vector3.zero
-            part.AssemblyAngularVelocity = Vector3.zero
+            -- Reset velocities to prevent glitching
+            part.Velocity = Vector3.new(0, 0, 0)
+            part.RotVelocity = Vector3.new(0, 0, 0)
+            part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+            part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
         end
     end
 
-    local function createTween(startCF, endCF)
+    local function createTween(startCF, endCF, isDescending)
         local distance = (endCF.Position - startCF.Position).Magnitude
-        local duration = distance / _G.flightSpeed
-
+        local tweenInfo = TweenInfo.new(
+            distance / (isDescending and (_G.flightSpeed * 0.7) or _G.flightSpeed),
+            Enum.EasingStyle.Linear,  -- Changed to Linear for consistent speed
+            Enum.EasingDirection.InOut
+        )
+        
         local cframe = Instance.new("CFrameValue")
         cframe.Value = startCF
-
+        
         cframe.Changed:Connect(function()
             if vehicle.PrimaryPart then
                 vehicle:SetPrimaryPartCFrame(cframe.Value)
-
+                
+                -- Keep resetting velocities during movement to prevent glitching
                 for _, part in pairs(vehicle:GetDescendants()) do
                     if part:IsA("BasePart") then
-                        part.Velocity = Vector3.zero
-                        part.RotVelocity = Vector3.zero
-                        part.AssemblyLinearVelocity = Vector3.zero
-                        part.AssemblyAngularVelocity = Vector3.zero
+                        part.Velocity = Vector3.new(0, 0, 0)
+                        part.RotVelocity = Vector3.new(0, 0, 0)
+                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                        part.AssemblyAngularVelocity = Vector3.new(0, 0, 0)
                     end
                 end
             end
         end)
-
-        local tween = TweenService:Create(cframe, TweenInfo.new(duration, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
+        
+        local tween = TweenService:Create(cframe, tweenInfo, {
             Value = endCF
         })
-
+        
         return tween, cframe
     end
 
-    local function smoothMove(startCF, endCF)
-        local tween, cframe = createTween(startCF, endCF)
+    local function smoothMove(startCF, endCF, isDescending)
+        local tween, cframe = createTween(startCF, endCF, isDescending)
         tween:Play()
         tween.Completed:Wait()
         cframe:Destroy()
-
+        
         if humanoid.SeatPart ~= driveSeat then
             driveSeat:Sit(humanoid)
             task.wait(0.1)
         end
     end
 
-    local fixedY = 2.30769644
+    -- First go up high
     local startCF = vehicle.PrimaryPart.CFrame
-    local fixedStart = CFrame.new(Vector3.new(startCF.Position.X, fixedY, startCF.Position.Z), startCF.LookVector + Vector3.new(0, 0, 1))
-    local fixedTarget = CFrame.new(Vector3.new(targetCFrame.Position.X, fixedY, targetCFrame.Position.Z), targetCFrame.LookVector + Vector3.new(0, 0, 1))
+    local upPos = startCF * CFrame.new(0, 350, 0)
+    smoothMove(startCF, upPos, false)
+    task.wait(0.1)
 
-    smoothMove(fixedStart, fixedTarget)
+    -- Move horizontally at height
+    local highTargetPos = CFrame.new(
+        Vector3.new(targetCFrame.Position.X, upPos.Position.Y, targetCFrame.Position.Z),
+        Vector3.new(targetCFrame.Position.X, upPos.Position.Y, targetCFrame.Position.Z) + targetCFrame.LookVector
+    )
+    smoothMove(vehicle.PrimaryPart.CFrame, highTargetPos, false)
     task.wait(0.2)
 
-    if math.abs(targetCFrame.Position.Y - fixedY) > 0.1 then
-        local finalTarget = CFrame.new(Vector3.new(targetCFrame.Position.X, targetCFrame.Position.Y, targetCFrame.Position.Z), targetCFrame.LookVector + Vector3.new(0, 0, 1))
-        smoothMove(fixedTarget, finalTarget)
-        task.wait(0.2)
-    end
-
-    for part, props in pairs(originalProps) do
+    -- Finally go down to target
+    smoothMove(vehicle.PrimaryPart.CFrame, targetCFrame, true)
+    
+    -- Restore original properties after a small delay
+    task.wait(0.2)
+    for part, props in pairs(originalProperties) do
         if part and part.Parent then
             part.Velocity = props.Velocity
             part.RotVelocity = props.RotVelocity
@@ -1197,12 +1631,14 @@ function frameTween(targetCFrame)
         end
     end
 
+    -- Final position check
     vehicle:SetPrimaryPartCFrame(targetCFrame)
     driveSeat:Sit(humanoid)
 end
 
+-- Teleport zu Dealer
 Tab3:AddButton({
-    Name = "🚗 Teleport to Nearest Dealer",
+    Name = "🔵 Teleport to Nearest Dealer",
     Callback = function()
         local character = player.Character or player.CharacterAdded:Wait()
         local vehicle = workspace.Vehicles:FindFirstChild(player.Name)
@@ -1224,16 +1660,12 @@ Tab3:AddButton({
         if not closest then return end
 
         frameTween(closest.CFrame + Vector3.new(0, 5, 0))
-        OrionLib:MakeNotification({
-            Name = "Samuel Teleport",
-            Content = "Teleported to nearest dealer!",
-            Time = 3
-        })
     end
 })
 
+-- OrionLib Button: Teleport to fixed coords (player + vehicle)
 Tab3:AddButton({
-    Name = "🏦 Robbery Bank (OP)",
+    Name = "🔵 Robbery Bank (OP)",
     Callback = function()
         local targetPos = Vector3.new(-1198.692993, 7.977509, 3161.447754)
         local targetCFrame = CFrame.new(targetPos)
@@ -1243,22 +1675,32 @@ Tab3:AddButton({
         local vehiclesFolder = workspace:FindFirstChild("Vehicles")
         local vehicle = (vehiclesFolder and vehiclesFolder:FindFirstChild(player.Name)) or nil
 
+        -- Wenn Fahrzeug vorhanden: benutze frameTween / moveVehicle (sanfte Bewegung)
         if vehicle and vehicle:IsA("Model") then
+            -- Versuche PrimaryPart zu setzen, falls nötig
             if not vehicle.PrimaryPart and type(setPrimaryPart) == "function" then
                 pcall(function() setPrimaryPart(vehicle) end)
             end
+            -- Fallback auf DriveSeat als PrimaryPart
             if not vehicle.PrimaryPart then
                 local ds = vehicle:FindFirstChild("DriveSeat")
                 if ds and ds:IsA("BasePart") then
                     vehicle.PrimaryPart = ds
                 end
             end
+
+            -- Wenn du frameTween definiert hast, verwende es; sonst moveVehicle
             if type(frameTween) == "function" then
+                -- frameTween erwartet ein CFrame; wir geben etwas leicht erhöhtes Ziel (vermeidet Bodencollision)
                 frameTween(targetCFrame + Vector3.new(0, 1, 0))
+            elseif type(moveVehicle) == "function" then
+                moveVehicle(vehicle, targetCFrame + CFrame.new(0,1,0))
             else
+                -- Fallback: setze Fahrzeug PrimaryPart direkt
                 if vehicle.PrimaryPart then
-                    vehicle:SetPrimaryPartCFrame(targetCFrame + CFrame.new(0, 1, 0))
+                    vehicle:SetPrimaryPartCFrame(targetCFrame + CFrame.new(0,1,0))
                 end
+                -- setze Spieler sicherlich rein, wenn Seat existiert
                 local driveSeat = vehicle:FindFirstChild("DriveSeat")
                 local humanoid = character:FindFirstChildOfClass("Humanoid")
                 if driveSeat and humanoid then
@@ -1266,6 +1708,7 @@ Tab3:AddButton({
                 end
             end
         else
+            -- Kein Fahrzeug: teleportiere nur den Spieler (leicht erhöht)
             if hrp then
                 hrp.CFrame = targetCFrame + Vector3.new(0, 3, 0)
             else
@@ -1275,16 +1718,18 @@ Tab3:AddButton({
                 end
             end
         end
-        OrionLib:MakeNotification({
-            Name = "Samuel Teleport",
-            Content = "Teleported to Bank!",
-            Time = 3
-        })
     end
 })
 
+
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local flightSpeed = 190 -- Langsamer machen (z. B. 20 statt 60)
+
 Tab3:AddDropdown({
-    Name = "📍 Normal Places",
+    Name = "🔵 Normal Places",
     Default = "1",
     Options = {"Prison Out", "Prison In","Police","Tuning Garage", "Hospital", "Tuner", "Dealership", "Fire Station", "Smuggler (near clothing store)", "Truck Company", "Bus Company"},
     Callback = function(Value)
@@ -1311,16 +1756,11 @@ Tab3:AddDropdown({
         if not vehicle or not vehicle:IsA("Model") then return end
 
         frameTween(targetCFrame)
-        OrionLib:MakeNotification({
-            Name = "Samuel Teleport",
-            Content = "Teleported to " .. Value .. "!",
-            Time = 3
-        })
     end
 })
 
 Tab3:AddDropdown({
-    Name = "🔫 Robbery Places",
+    Name = "🔵 Robbery Places",
     Default = "1",
     Options = {"Bank", "Jewellery", "Erwin Club", "Gas-N-Go Fuel", "Ares Fuel", "Tool Shop", "Farm Shop", "Osso Fuel", "Container Ship", "Clothing Store"},
     Callback = function(Value)
@@ -1344,64 +1784,61 @@ Tab3:AddDropdown({
         if not vehicle or not vehicle:IsA("Model") then return end
 
         frameTween(targetCFrame)
-        OrionLib:MakeNotification({
-            Name = "Samuel Teleport",
-            Content = "Teleported to " .. Value .. "!",
-            Time = 3
-        })
     end
 })
 
-Tab3:AddSection({
-    Name = "👥 Player Teleport"
-})
-
-local playerList = {}
-for _, p in pairs(Players:GetPlayers()) do
-    if p ~= player then
-        table.insert(playerList, p.Name)
-    end
-end
-
-Tab3:AddDropdown({
-    Name = "👤 Teleport to Player",
-    Default = "Select Player",
-    Options = playerList,
-    Callback = function(Value)
-        local targetPlayer = Players:FindFirstChild(Value)
-        if targetPlayer and targetPlayer.Character then
-            local targetRoot = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-            local localRoot = player.Character:FindFirstChild("HumanoidRootPart")
-            
-            if targetRoot and localRoot then
-                localRoot.CFrame = targetRoot.CFrame
-                OrionLib:MakeNotification({
-                    Name = "Samuel Teleport",
-                    Content = "Teleported to " .. Value,
-                    Time = 3
-                })
-            end
-        end
-    end
-})
-
--- ===========================
--- ESP TAB (Enhanced GUI)
--- ===========================
 local Tab4 = Window:MakeTab({
-    Name = "👁️│ESP",
-    Icon = "rbxassetid://7733766307"
+	Name = "👁️│Esp",
+	PremiumOnly = false
 })
 
-Tab4:AddSection({
-    Name = "👁️ ESP Options"
-})
-
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local Drawing = Drawing
+
 local LocalPlayer = Players.LocalPlayer
 local ESPEnabled = false
+
+-- Wanted ESP Variables
 local WantedESPEnabled = false
 local activeWantedLabels = {}
+
+local function RemoveESP(player)
+    -- bleibt als Platzhalter, falls später benötigt
+end
+
+local function ToggleESP(value)
+    ESPEnabled = value
+end
+
+local function ToggleTeamColors(value)
+    -- entfernt: Name ESP nutzt Teamfarben nicht mehr
+end
+
+local function SetESPSize(value)
+    -- entfernt: Name ESP Größe wird nicht mehr verwendet
+end
+
+Tab4:AddToggle({
+	Name = "⚪ HealthBar ESP",
+	Default = false,
+	Callback = function(Value)
+		ESPEnabled = Value
+		if not ESPEnabled then
+			for _, player in pairs(Players:GetPlayers()) do
+				if player ~= LocalPlayer then
+					local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+					if humanoid then
+						local healthBar = humanoid:FindFirstChild("_HealthBar")
+						if healthBar then
+							healthBar.Visible = false
+						end
+					end
+				end
+			end
+		end
+	end    
+})
 
 local function createHealthBar(player)
     local healthBar = Drawing.new("Square")
@@ -1464,55 +1901,237 @@ local function createHealthBar(player)
     end)
 end
 
-Tab4:AddToggle({
-    Name = "❤️ HealthBar ESP",
-    Default = false,
-    Callback = function(Value)
-        ESPEnabled = Value
-        if Value then
-            for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LocalPlayer then
-                    createHealthBar(p)
-                end
-            end
-        end
-        OrionLib:MakeNotification({
-            Name = "Samuel ESP",
-            Content = Value and "HealthBar ESP Enabled" or "HealthBar ESP Disabled",
-            Time = 2
-        })
-    end    
-})
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        createHealthBar(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        createHealthBar(player)
+    end
+end)
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
 local ESPEnabled = false
 local UseTeamColor = false
 
 Tab4:AddToggle({
-    Name = "📦 Box ESP",
+    Name = "⚪ Box ESP",
     Default = false,
     Callback = function(Value)
         ESPEnabled = Value
-        OrionLib:MakeNotification({
-            Name = "Samuel ESP",
-            Content = Value and "Box ESP Enabled" or "Box ESP Disabled",
-            Time = 2
-        })
+        if not ESPEnabled then
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer then
+                    local box = player:FindFirstChild("_Box")
+                    if box then
+                        box.Visible = false
+                    end
+                end
+            end
+        end
     end
 })
 
 Tab4:AddToggle({
-    Name = "🎨 Use Team Colors",
+    Name = "⚪ Use Team Colors",
     Default = false,
     Callback = function(Value)
         UseTeamColor = Value
-        OrionLib:MakeNotification({
-            Name = "Samuel ESP",
-            Content = Value and "Team Colors Enabled" or "Team Colors Disabled",
-            Time = 2
-        })
+        if ToggleTeamColors then
+            ToggleTeamColors(Value)
+        end
     end
 })
 
+local function createBox(player)
+    local box = Drawing.new("Square")
+    box.Visible = false
+    box.Thickness = 1
+    box.Transparency = 1
+    box.Color = Color3.new(1, 0, 0)
+
+    local function update()
+        if not ESPEnabled then
+            box.Visible = false
+            return
+        end
+
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+            local character = player.Character
+            local rootPart = character.HumanoidRootPart
+
+            if UseTeamColor and player.Team then
+                box.Color = player.Team.TeamColor.Color
+            else
+                box.Color = Color3.new(1, 0, 0)
+            end
+
+            local cframe, size = character:GetBoundingBox()
+
+            local adjustedHeight = math.clamp(size.Y, 4, 7)
+            local adjustedWidth = math.clamp(size.X, 2, 4)
+            
+            size = Vector3.new(adjustedWidth, adjustedHeight, size.Z)
+
+            local minScreenPos, maxScreenPos = Vector2.new(math.huge, math.huge), Vector2.new(-math.huge, -math.huge)
+            for _, corner in ipairs({
+                Vector3.new(-size.X / 2, size.Y / 2, -size.Z / 2),
+                Vector3.new(size.X / 2, size.Y / 2, -size.Z / 2),
+                Vector3.new(-size.X / 2, -size.Y / 2, -size.Z / 2),
+                Vector3.new(size.X / 2, -size.Y / 2, -size.Z / 2),
+                Vector3.new(-size.X / 2, size.Y / 2, size.Z / 2),
+                Vector3.new(size.X / 2, size.Y / 2, size.Z / 2),
+                Vector3.new(-size.X / 2, -size.Y / 2, size.Z / 2),
+                Vector3.new(size.X / 2, -size.Y / 2, size.Z / 2),
+            }) do
+                local worldPos = (cframe * corner)
+                local screenPos, onScreen = workspace.CurrentCamera:WorldToViewportPoint(worldPos)
+                if onScreen then
+                    minScreenPos = Vector2.new(
+                        math.min(minScreenPos.X, screenPos.X),
+                        math.min(minScreenPos.Y, screenPos.Y)
+                    )
+                    maxScreenPos = Vector2.new(
+                        math.max(maxScreenPos.X, screenPos.X),
+                        math.max(maxScreenPos.Y, screenPos.Y)
+                    )
+                else
+                    box.Visible = false
+                    return
+                end
+            end
+
+            box.Size = maxScreenPos - minScreenPos
+            box.Position = minScreenPos
+            box.Visible = true
+        else
+            box.Visible = false
+        end
+    end
+
+    local connection
+    connection = RunService.RenderStepped:Connect(update)
+
+    player.AncestryChanged:Connect(function()
+        if not player:IsDescendantOf(Players) then
+            connection:Disconnect()
+            box:Remove()
+        end
+    end)
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        createBox(player)
+    end
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        createBox(player)
+    end
+end)
+
+
+--------------------------------------------------------------------------------
+-- KODUN SONU
+--------------------------------------------------------------------------------
+-- 1) AIMBOT TAB VE SECTION
+--------------------------------------------------------------------------------
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+local AimFOV = 42
+local smoothing = 0.5  
+local maxTargetDistance = 500 
+local predictionFactor = 0.0575 
+local predictToggle = false
+local lockPart = "HumanoidRootPart" 
+local aimbotEnabled = false  
+local fovCircleEnabled = false  
+local fovColor = Color3.fromRGB(255, 255, 255)  
+
+local function removeMobileGui()
+    if aimbotGui then
+        aimbotGui:Destroy()
+        aimbotGui = nil
+        aimbotButton = nil
+    end
+end
+
+local function createMobileGui()
+    if aimbotGui then return fovCircleEnabled end
+
+    aimbotGui = Instance.new("ScreenGui")
+    aimbotGui.Name = "MobileAimbotGui"
+    aimbotGui.Parent = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
+
+    aimbotButton = Instance.new("TextButton")
+    aimbotButton.Size = UDim2.new(0, 200, 0, 50)
+    aimbotButton.Position = UDim2.new(0.5, -100, 0.8, 0)
+    aimbotButton.Text = "Aimbot: OFF"
+    aimbotButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) 
+    aimbotButton.TextColor3 = Color3.fromRGB(255, 255, 255) 
+    aimbotButton.Font = Enum.Font.SourceSans
+    aimbotButton.TextSize = 24
+    aimbotButton.Parent = aimbotGui
+
+    Instance.new("UICorner", aimbotButton)
+
+    aimbotButton.MouseButton1Click:Connect(function()
+        aimbotEnabled = not aimbotEnabled  -- Aimbot değişkenini değiştir
+
+        if aimbotEnabled then
+            aimbotButton.Text = "Aimbot: ON"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0) 
+        else
+            aimbotButton.Text = "Aimbot: OFF"
+            aimbotButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0) 
+        end
+    end)
+
+    local dragging = false
+    local dragStart = nil
+    local startPos = nil
+
+    aimbotButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = aimbotButton.Position
+        end
+    end)
+
+    aimbotButton.InputChanged:Connect(function(input)
+        if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - dragStart
+            aimbotButton.Position = UDim2.new(
+                startPos.X.Scale,
+                startPos.X.Offset + delta.X,
+                startPos.Y.Scale,
+                startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
+
+    aimbotButton.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+end
+
+-- Function to add Wanted label
 local function addWantedLabel(player)
     if player == LocalPlayer then return end
     local character = player.Character
@@ -1542,6 +2161,7 @@ local function addWantedLabel(player)
     activeWantedLabels[player] = billboardGui
 end
 
+-- Function to remove Wanted label
 local function removeWantedLabel(player)
     local character = player.Character
     if not character then return end
@@ -1554,6 +2174,7 @@ local function removeWantedLabel(player)
     activeWantedLabels[player] = nil
 end
 
+-- Function to update all Wanted labels
 local function updateAllWantedLabels()
     if not WantedESPEnabled then
         for _, player in pairs(Players:GetPlayers()) do
@@ -1575,8 +2196,9 @@ local function updateAllWantedLabels()
     end
 end
 
+-- Add Wanted ESP Toggle
 Tab4:AddToggle({
-    Name = "👮 Crime ESP",
+    Name = "⚪ Crime ESP",
     Default = false,
     Callback = function(Value)
         WantedESPEnabled = Value
@@ -1587,14 +2209,10 @@ Tab4:AddToggle({
         else
             updateAllWantedLabels()
         end
-        OrionLib:MakeNotification({
-            Name = "Samuel ESP",
-            Content = Value and "Crime ESP Enabled" or "Crime ESP Disabled",
-            Time = 2
-        })
     end
 })
 
+-- Start the update loop
 spawn(function()
     while true do
         if WantedESPEnabled then
@@ -1604,24 +2222,32 @@ spawn(function()
     end
 end)
 
--- ===========================
--- AIMBOT TAB (Enhanced GUI)
--- ===========================
+-- Handle character added events
+local function onCharacterAdded(player, character)
+    wait(1)
+    if WantedESPEnabled then
+        updateAllWantedLabels()
+    end
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    player.CharacterAdded:Connect(function(char)
+        onCharacterAdded(player, char)
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char)
+        onCharacterAdded(player, char)
+    end)
+end)
+
+
 local AimbotTab = Window:MakeTab({
-    Name = "🎯│Aimbot",
-    Icon = "rbxassetid://7733855923"
+    Name = "🔴│Aimbot",
+    PremiumOnly = false
 })  
-
-local AimFOV = 42
-local smoothing = 0.5  
-local maxTargetDistance = 500 
-local predictionFactor = 0.0575 
-local predictToggle = false
-local lockPart = "HumanoidRootPart" 
-local aimbotEnabled = false  
-local fovCircleEnabled = false  
-local fovColor = Color3.fromRGB(255, 255, 255)  
-
+ 
 local FOVring = Drawing.new("Circle")
 FOVring.Visible = false 
 FOVring.Thickness = 1
@@ -1629,69 +2255,45 @@ FOVring.Radius = AimFOV
 FOVring.Transparency = 1
 FOVring.Color = fovColor
 FOVring.Position = workspace.CurrentCamera.ViewportSize / 2
-
-AimbotTab:AddSection({
-    Name = "🎯 Aimbot Settings"
-})
-
+ 
 AimbotTab:AddToggle({
-    Name = "🎯 Aimbot",
+    Name = "🔴 Aimbot",
     Default = false,
     Callback = function(value)
         aimbotEnabled = value
-        FOVring.Visible = value and fovCircleEnabled
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = value and "Aimbot Enabled" or "Aimbot Disabled",
-            Time = 2
-        })
     end    
 })
-
+ 
 AimbotTab:AddBind({
-    Name = "🔑 Aimbot Keybind",
+    Name = "🔴 Aimbot Keybind",
     Default = Enum.KeyCode.V, 
     Hold = false,
     Callback = function()
         aimbotEnabled = not aimbotEnabled 
-        FOVring.Visible = aimbotEnabled and fovCircleEnabled
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = aimbotEnabled and "Aimbot Enabled" or "Aimbot Disabled",
-            Time = 2
-        })
+        FOVring.Visible = aimbotEnabled
     end    
 })
-
+ 
 AimbotTab:AddDropdown({
-    Name = "🎯 Aim Part",
+    Name = "🔴 Shot",
     Default = "Head",  
     Options = {"Head", "Body"},  
     Callback = function(value)
         lockPart = value == "Body" and "HumanoidRootPart" or value  
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = "Aim Part: " .. value,
-            Time = 2
-        })
     end
 })
-
+ 
 AimbotTab:AddToggle({
-    Name = "📊 Prediction",
+    Name = "🔴 Prediction",
     Default = true,
     Callback = function(value)
         predictToggle = value
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = value and "Prediction Enabled" or "Prediction Disabled",
-            Time = 2
-        })
     end    
 })
-
+ 
+ 
 AimbotTab:AddSlider({
-    Name = "⚡ Smoothness",
+    Name = "🔴 Smoothness",
     Min = 1,
     Max = 10,
     Default = 2,
@@ -1699,50 +2301,28 @@ AimbotTab:AddSlider({
     Color = Color3.fromRGB(191, 42, 42),
     ValueName = "",
     Callback = function(value)
-        smoothing = (10 - value) / 10
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = "Smoothness: " .. tostring(value),
-            Time = 2
-        })
+        smoothing = (10 - value) / 10  -- Kaydırıcıdaki değeri tersine çevir
     end
 })
-
-AimbotTab:AddSlider({
-    Name = "🎯 FOV Size",
-    Min = 10,
-    Max = 200,
-    Default = 42,
-    Increment = 5,
-    Color = Color3.fromRGB(0, 200, 255),
-    ValueName = "Pixels",
-    Callback = function(value)
-        AimFOV = value
-        FOVring.Radius = value
-        OrionLib:MakeNotification({
-            Name = "Samuel Aimbot",
-            Content = "FOV Size: " .. tostring(value),
-            Time = 2
-        })
-    end
-})
-
+ 
+ 
+ 
 local function isWithinDistance(targetPart)
     local distance = (workspace.CurrentCamera.CFrame.Position - targetPart.Position).Magnitude
     return distance <= maxTargetDistance
 end
-
+ 
 local function getClosest()
     local target = nil
     local shortestDistance = math.huge
     local screenCenter = workspace.CurrentCamera.ViewportSize / 2
-
+ 
     for _, v in pairs(Players:GetPlayers()) do
         if v ~= LocalPlayer and v.Character and v.Character:FindFirstChild(lockPart) then
             local targetPart = v.Character[lockPart]
             local screenPoint, onScreen = workspace.CurrentCamera:WorldToViewportPoint(targetPart.Position)
             local distanceFromCenter = (Vector2.new(screenPoint.X, screenPoint.Y) - screenCenter).Magnitude
-
+ 
             if onScreen and distanceFromCenter <= AimFOV and distanceFromCenter < shortestDistance then
                 shortestDistance = distanceFromCenter
                 target = v
@@ -1751,7 +2331,7 @@ local function getClosest()
     end
     return target
 end
-
+ 
 local function predictPosition(target)
     if target and target.Character and target.Character:FindFirstChild(lockPart) then
         local velocity = target.Character[lockPart].Velocity
@@ -1760,12 +2340,12 @@ local function predictPosition(target)
     end
     return nil
 end
-
+ 
 RunService.RenderStepped:Connect(function()
     if aimbotEnabled then
         FOVring.Position = workspace.CurrentCamera.ViewportSize / 2
         FOVring.Visible = fovCircleEnabled
-
+ 
         if UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
             local currentTarget = getClosest()
             if currentTarget and currentTarget.Character and currentTarget.Character:FindFirstChild(lockPart) then
@@ -1778,15 +2358,20 @@ RunService.RenderStepped:Connect(function()
     end
 end)
 
--- ===========================
--- POLICE TAB (Enhanced GUI)
--- ===========================
-local PoliceTab = Window:MakeTab({
-    Name = "👮│Police",
-    Icon = "rbxassetid://7733958701"
+local Tab = Window:MakeTab({
+    Name = "👮🏿│Police",
+    PremiumOnly = false
 })
 
-PoliceTab:AddParagraph("Samuel RadarFarm","Earn big money with no ban risk!")
+--[[
+Name = <string> - The name of the tab.
+Icon = <string> - The icon of the tab.
+PremiumOnly = <bool> - Makes the tab accessible to Sirus Premium users only.
+]]
+
+
+Tab:AddParagraph("RadarFarm","You can make with it big money no ban chance")
+
 
 local rs = game:GetService("ReplicatedStorage")
 local char = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
@@ -1796,9 +2381,14 @@ _G.RadarFarmEnabled = false
 
 local function startRadarFarm()
   local remote = rs.Bnl:FindFirstChild("bbb7c252-304d-4582-b2a0-89eb9d3a0855")
-  if not remote then return end
+  if not remote then
+    print("wda")
+    return
+  end
 
   _G.RadarFarmEnabled = true
+  print("Radar Farm startet")
+
   while _G.RadarFarmEnabled do
     local radarGun = char:FindFirstChild("Radar Gun")
 
@@ -1813,89 +2403,81 @@ local function startRadarFarm()
           end)
         end
       end
+    else
+      print("Radar gun not found")
     end
+
     task.wait(1)
   end
 end
 
 local function stopRadarFarm()
   _G.RadarFarmEnabled = false
+  print("RadarStop")
 end
 
-PoliceTab:AddSection({
-    Name = "📡 Police Features"
-})
 
-PoliceTab:AddToggle({
-  Name = "📡 RadarFarm",
+
+Tab:AddToggle({
+  Name = "🟤 RadarFarm",
   Default = false,
   Callback = function(Value)
     if Value then
+      -- Update character reference
       char = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
       hrp = char:WaitForChild("HumanoidRootPart")
       spawn(startRadarFarm)
-      OrionLib:MakeNotification({
-        Name = "Samuel RadarFarm",
-        Content = "RadarFarm Started!",
-        Time = 3
-      })
     else
       stopRadarFarm()
-      OrionLib:MakeNotification({
-        Name = "Samuel RadarFarm",
-        Content = "RadarFarm Stopped!",
-        Time = 3
-      })
     end
   end
 })
 
+-- Variables for anti-AFK functionality
 local antiAfkEnabled = false
 local bb = game:GetService('VirtualUser')
-local player = game.Players.LocalPlayer
+local player = game:GetService('Players').LocalPlayer
 
+-- Anti-AFK function
 local function enableAntiAfk()
     player.Idled:Connect(function()
         if antiAfkEnabled then
             bb:CaptureController()
             bb:ClickButton2(Vector2.new())
+            print("Roblox tried kicking you, but I didn't let them!")
         end
     end)
 end
 
-PoliceTab:AddToggle({
-    Name = "⏰ Anti-AFK",
+-- Toggle for Anti-AFK
+Tab:AddToggle({
+    Name = "🟤 Anti-AFK",
     Default = false,
     Callback = function(Value)
         antiAfkEnabled = Value
         if antiAfkEnabled then
             enableAntiAfk()
-            OrionLib:MakeNotification({
-                Name = "Samuel Anti-AFK",
-                Content = "Anti-AFK Enabled!",
-                Time = 3
-            })
+            print("Anti-AFK is now enabled.")
         else
-            OrionLib:MakeNotification({
-                Name = "Samuel Anti-AFK",
-                Content = "Anti-AFK Disabled",
-                Time = 3
-            })
+            print("Anti-AFK is now disabled.")
         end
     end
 })
 
-PoliceTab:AddSection({
-    Name = "📍 Police Teleports"
-})
 
-PoliceTab:AddDropdown({
-    Name = "🚓 Police Teleports",
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local flightSpeed = 190 -- Langsamer machen (z. B. 20 statt 60)
+
+Tab:AddDropdown({
+    Name = "🟤 💎│Teleports",
     Default = "1",
-    Options = {"Police Station", "Farming Places"},
+    Options = {"Police", "Farming Places",},
     Callback = function(Value)
         local locations = {
-            ["Police Station"] = CFrame.new(-1670.691528, 5.99, 2771.11),
+            ["Police"] = CFrame.new(-1670.691528, 5.99, 2771.11),
             ["Farming Places"] = CFrame.new(-1148.454346, 9.49, 2805.56),
         }
 
@@ -1906,44 +2488,41 @@ PoliceTab:AddDropdown({
         if not vehicle or not vehicle:IsA("Model") then return end
 
         frameTween(targetCFrame)
-        OrionLib:MakeNotification({
-            Name = "Samuel Teleport",
-            Content = "Teleported to " .. Value .. "!",
-            Time = 3
-        })
     end
 })
 
--- ===========================
--- SELF REVIVE TAB (Enhanced GUI)
--- ===========================
-local ReviveTab = Window:MakeTab({
-    Name = "💜│Self Revive",
-    Icon = "rbxassetid://7734074391"
+local Tab = Window:MakeTab({
+    Name = "💜│Selv Revive",
+    PremiumOnly = false
 })
 
-ReviveTab:AddParagraph("Samuel Auto-Revive","Automatically heal when low health!")
+Tab:AddParagraph("Please wait 1m and you will be healed (OP)", "")
 
-ReviveTab:AddButton({
-    Name = "💜 Activate Self-Revive",
+Tab:AddButton({
+    Name = "Aktiviere Self-Revive",
     Callback = function()
+        -- Sicherheits-Check (nur Emergency Hamburg)
         if game.PlaceId ~= 7711635737 then
             OrionLib:MakeNotification({
-                Name = "Error",
-                Content = "This script only works in Emergency Hamburg (7711635737).",
+                Name = "Fehler",
+                Content = "Dieses Script funktioniert nur in Emergency Hamburg (7711635737).",
                 Time = 4
             })
             return
         end
 
+        -- Services
         local Players = game:GetService("Players")
         local TweenService = game:GetService("TweenService")
         local Workspace = game:GetService("Workspace")
 
         local LocalPlayer = Players.LocalPlayer
+
+        -- State
         local autoReviveEnabled = true
         local healthConnection = nil
 
+        -- Tween-Teleport Funktion (robust)
         local function tweenTo(destination)
             local VehiclesFolder = Workspace:FindFirstChild("Vehicles")
             local car = VehiclesFolder and VehiclesFolder:FindFirstChild(LocalPlayer.Name)
@@ -1995,12 +2574,14 @@ ReviveTab:AddButton({
                 end
             end
 
+            -- sanfte Start-/Landing-Bewegungen
             pcall(function() moveTo(car.PrimaryPart.Position + Vector3.new(0, -4, 0)) end)
             pcall(function() moveTo(destination + Vector3.new(0, -4, 0)) end)
             pcall(function() moveTo(destination) end)
             return true
         end
 
+        -- Auto-Heilung & Rückkehr
         local function autoHealAndReturn(originalPosition)
             local char = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
             local humanoid = char:FindFirstChild("Humanoid")
@@ -2013,19 +2594,21 @@ ReviveTab:AddButton({
 
             if not bed then
                 OrionLib:MakeNotification({
-                    Name = "Samuel Self-Revive Error",
-                    Content = "HospitalBed not found (Error 404)",
+                    Name = "Self-Revive Fehler",
+                    Content = "HospitalBed nicht gefunden (Error 404)",
                     Time = 4
                 })
                 return false
             end
 
+            -- Aus Fahrzeug aussteigen wenn nötig
             if humanoid.Sit then
                 humanoid.Sit = false
                 humanoid.Jump = true
                 task.wait(0.12)
             end
 
+            -- Zum Bett teleportieren (sanft)
             if char:FindFirstChild("HumanoidRootPart") then
                 local hrp = char.HumanoidRootPart
                 hrp.CFrame = bed.CFrame * CFrame.new(0, 3, 0)
@@ -2038,6 +2621,7 @@ ReviveTab:AddButton({
                 task.wait(0.12)
             end
 
+            -- Versuche zu sitzen
             local attempts = 0
             while not humanoid.Sit and attempts < 6 do
                 pcall(function() bed:Sit(humanoid) end)
@@ -2045,12 +2629,15 @@ ReviveTab:AddButton({
                 task.wait(0.22)
             end
 
+            -- Warte bis genug geheilt
             repeat task.wait(0.2) until humanoid.Health >= humanoid.MaxHealth * 0.27
 
+            -- Aufstehen
             humanoid.Sit = false
             humanoid.Jump = true
             task.wait(0.2)
 
+            -- Zurück zum Auto und weiterfahren
             local car = Workspace:FindFirstChild("Vehicles") and Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
             if car and char:FindFirstChild("HumanoidRootPart") and car:FindFirstChild("DriveSeat") then
                 char.HumanoidRootPart.CFrame = car.DriveSeat.CFrame * CFrame.new(0, 2, 0)
@@ -2062,12 +2649,13 @@ ReviveTab:AddButton({
             return true
         end
 
+        -- Hauptcheck
         local function checkHealthAndTeleport()
             local car = Workspace:FindFirstChild("Vehicles") and Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
             if not car then
                 OrionLib:MakeNotification({
-                    Name = "Samuel Self-Revive",
-                    Content = "No vehicle found.",
+                    Name = "Self-Revive",
+                    Content = "Kein Fahrzeug gefunden.",
                     Time = 3
                 })
                 return
@@ -2089,13 +2677,14 @@ ReviveTab:AddButton({
                 end
             else
                 OrionLib:MakeNotification({
-                    Name = "Samuel Self-Revive",
-                    Content = "You are not injured - no action needed",
+                    Name = "Self-Revive",
+                    Content = "Du bist nicht verletzt – keine Aktion nötig",
                     Time = 3
                 })
             end
         end
 
+        -- Aktivierungslogik (setzt Connection)
         local function enableAutoRevive(val)
             autoReviveEnabled = val
             if val then
@@ -2118,6 +2707,7 @@ ReviveTab:AddButton({
             end
         end
 
+        -- Respawn Reattach
         LocalPlayer.CharacterAdded:Connect(function(char)
             if autoReviveEnabled then
                 char:WaitForChild("Humanoid").HealthChanged:Connect(function(hp)
@@ -2128,236 +2718,17 @@ ReviveTab:AddButton({
             end
         end)
 
+        -- Starte Auto-Revive
         enableAutoRevive(true)
 
         OrionLib:MakeNotification({
-            Name = "Samuel Self-Revive",
-            Content = "Auto-Revive activated! (Use with caution)",
+            Name = "Self-Revive aktiviert",
+            Content = "Auto-Revive läuft jetzt (vorsichtig verwenden).",
             Time = 5
         })
     end
 })
 
--- ===========================
--- VISUAL TAB (NEW)
--- ===========================
-local VisualTab = Window:MakeTab({
-    Name = "✨│Visual",
-    Icon = "rbxassetid://7734059712"
-})
 
-VisualTab:AddSection({
-    Name = "✨ Visual Effects"
-})
-
-VisualTab:AddToggle({
-    Name = "💡 Fullbright",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            game:GetService("Lighting").Brightness = 2
-            game:GetService("Lighting").ClockTime = 14
-            game:GetService("Lighting").FogEnd = 100000
-            game:GetService("Lighting").GlobalShadows = false
-            OrionLib:MakeNotification({
-                Name = "Samuel Visual",
-                Content = "Fullbright Enabled!",
-                Time = 3
-            })
-        else
-            game:GetService("Lighting").Brightness = 1
-            game:GetService("Lighting").ClockTime = 14
-            game:GetService("Lighting").FogEnd = 100000
-            game:GetService("Lighting").GlobalShadows = true
-            OrionLib:MakeNotification({
-                Name = "Samuel Visual",
-                Content = "Fullbright Disabled",
-                Time = 3
-            })
-        end
-    end
-})
-
-VisualTab:AddToggle({
-    Name = "👁️ Player Chams",
-    Default = false,
-    Callback = function(Value)
-        if Value then
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= Players.LocalPlayer and player.Character then
-                    for _, part in pairs(player.Character:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            local highlight = Instance.new("Highlight")
-                            highlight.FillColor = Color3.fromRGB(255, 0, 0)
-                            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                            highlight.FillTransparency = 0.5
-                            highlight.Parent = part
-                        end
-                    end
-                end
-            end
-            OrionLib:MakeNotification({
-                Name = "Samuel Visual",
-                Content = "Player Chams Enabled!",
-                Time = 3
-            })
-        else
-            for _, player in pairs(Players:GetPlayers()) do
-                if player.Character then
-                    for _, highlight in pairs(player.Character:GetDescendants()) do
-                        if highlight:IsA("Highlight") then
-                            highlight:Destroy()
-                        end
-                    end
-                end
-            end
-            OrionLib:MakeNotification({
-                Name = "Samuel Visual",
-                Content = "Player Chams Disabled",
-                Time = 3
-            })
-        end
-    end
-})
-
-VisualTab:AddButton({
-    Name = "⚡ FPS Boost",
-    Callback = function()
-        for _, v in pairs(Workspace:GetDescendants()) do
-            if v:IsA("BasePart") and not v.Anchored then
-                v.Material = Enum.Material.Plastic
-                v.Reflectance = 0
-            elseif v:IsA("Decal") then
-                v.Transparency = 1
-            elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-                v.Lifetime = NumberRange.new(0)
-            elseif v:IsA("Explosion") then
-                v.BlastPressure = 1
-                v.BlastRadius = 1
-            end
-        end
-        
-        game:GetService("Lighting").GlobalShadows = false
-        game:GetService("Lighting").FogEnd = 100000
-        settings().Rendering.QualityLevel = 1
-        
-        OrionLib:MakeNotification({
-            Name = "Samuel FPS Boost",
-            Content = "Graphics optimized for performance!",
-            Time = 3
-        })
-    end
-})
-
--- ===========================
--- MISC TAB (NEW)
--- ===========================
-local MiscTab = Window:MakeTab({
-    Name = "⚙️│Misc",
-    Icon = "rbxassetid://7734074391"
-})
-
-MiscTab:AddSection({
-    Name = "🔄 Misc Utilities"
-})
-
-MiscTab:AddButton({
-    Name = "🔄 Server Hop",
-    Callback = function()
-        local Http = game:GetService("HttpService")
-        local TPS = game:GetService("TeleportService")
-        local API = "https://games.roblox.com/v1/games/%s/servers/Public?sortOrder=Asc&limit=100"
-        
-        local function servers()
-            local raw = game:HttpGet(API:format(game.PlaceId))
-            return Http:JSONDecode(raw)
-        end
-        
-        local function hop()
-            local data = servers()
-            local servers = data.data
-            for _, server in ipairs(servers) do
-                if server.id ~= game.JobId then
-                    TPS:TeleportToPlaceInstance(game.PlaceId, server.id)
-                    task.wait(2)
-                end
-            end
-        end
-        
-        hop()
-        OrionLib:MakeNotification({
-            Name = "Samuel Server",
-            Content = "Server hopping...",
-            Time = 3
-        })
-    end
-})
-
-MiscTab:AddButton({
-    Name = "🔄 Rejoin Server",
-    Callback = function()
-        TeleportService:Teleport(game.PlaceId)
-        OrionLib:MakeNotification({
-            Name = "Samuel Server",
-            Content = "Rejoining server...",
-            Time = 3
-        })
-    end
-})
-
-MiscTab:AddButton({
-    Name = "⚡ Load Infinite Yield",
-    Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
-        OrionLib:MakeNotification({
-            Name = "Samuel Misc",
-            Content = "Infinite Yield loaded!",
-            Time = 3
-        })
-    end
-})
-
-MiscTab:AddButton({
-    Name = "🗑️ Destroy GUI",
-    Callback = function()
-        OrionLib:Destroy()
-    end
-})
-
-MiscTab:AddSection({
-    Name = "⚙️ Settings"
-})
-
-MiscTab:AddBind({
-    Name = "🎮 UI Toggle Key",
-    Default = Enum.KeyCode.RightShift,
-    Hold = false,
-    Callback = function()
-        Window:Close()
-    end
-})
-
-MiscTab:AddButton({
-    Name = "💾 Save Settings",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "Samuel Settings",
-            Content = "Settings saved!",
-            Time = 3
-        })
-    end
-})
-
--- ===========================
--- INITIALIZE GUI
--- ===========================
+-- GUI starten
 OrionLib:Init()
-
--- Initial Notification
-task.wait(1)
-OrionLib:MakeNotification({
-    Name = "Samuel's Emergency Hamburg",
-    Content = "Script successfully loaded! Enjoy!",
-    Time = 5,
-    Image = "rbxassetid://4483345998"
-})

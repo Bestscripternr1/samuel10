@@ -1,4 +1,5 @@
-local OrionLib = loadstring(game:HttpGet('https://raw.githubusercontent.com/1nig1htmare1234/SCRIPTS/refs/heads/main/Orion.lua'))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/1nig1htmare1234/SCRIPTS/refs/heads/main/Orion.lua')))()
+local Material = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/MaterialLua/master/Module.lua"))()
 
 -- Services
 local Players = game:GetService("Players")
@@ -10,491 +11,251 @@ local TeleportService = game:GetService("TeleportService")
 local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local CoreGui = game:GetService("CoreGui")
-local Camera = Workspace.CurrentCamera
 
 local LocalPlayer = Players.LocalPlayer
+local Camera = Workspace.CurrentCamera
 
 -- ===========================
--- PREMIUM UI DESIGN
+-- PREMIUM GUI DESIGN
 -- ===========================
-local Window = OrionLib:MakeWindow({
-    Name = "│samuel.1 │〄Emergency Hamburg ⭐",
-    SaveConfig = false,
-    IntroText = "Premium Edition v10.1",
-    IntroIcon = "rbxassetid://4483345998",
+local Window = Material.Load({
+    Title = "Samuel Scripts | Emergency Hamburg",
+    Style = 3,
+    SizeX = 500,
+    SizeY = 450,
     Theme = "Dark",
-    ConfigFolder = "SamuelScripts"
+    ColorOverrides = {
+        MainFrame = Color3.fromRGB(25, 25, 35),
+        Min = Color3.fromRGB(0, 170, 255),
+        Max = Color3.fromRGB(0, 170, 255),
+        Toggle = Color3.fromRGB(0, 170, 255),
+        Slider = Color3.fromRGB(0, 170, 255),
+        Dropdown = Color3.fromRGB(0, 170, 255),
+    }
 })
 
 -- ===========================
--- CREDITS TAB - PREMIUM DESIGN
+-- WALLHACK (Durchsichtige Wände)
 -- ===========================
-local CreditsTab = Window:MakeTab({ Name = "👑│Credits", Icon = "rbxassetid://4483345998" })
-
-CreditsTab:AddLabel("╔══════════════════════════╗")
-CreditsTab:AddLabel("       PREMIUM SCRIPT       ")
-CreditsTab:AddLabel("╚══════════════════════════╝")
-
-CreditsTab:AddParagraph("✨ Developed by Samuel", "Emergency Hamburg Specialist")
-
-CreditsTab:AddLabel(" ")
-CreditsTab:AddLabel("📅 Version: 10.1 Premium")
-CreditsTab:AddLabel("🌟 Last Updated: Today")
-CreditsTab:AddLabel(" ")
-
-CreditsTab:AddButton({
-    Name = "📱 Copy Discord Link",
-    Callback = function()
-        setclipboard("https://discord.gg/MNEv7h9yWU")
-        OrionLib:MakeNotification({
-            Name = "Discord",
-            Content = "✅ Discord link copied!",
-            Image = "rbxassetid://4483345998",
-            Time = 3
-        })
-    end
+local WallhackTab = Window.New({
+    Title = "🔍 Wallhack"
 })
 
-CreditsTab:AddButton({
-    Name = "⭐ Rate Script",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "Thank You!",
-            Content = "Thanks for using Samuel Scripts! ⭐",
-            Image = "rbxassetid://4483345998",
-            Time = 5
-        })
-    end
-})
+local wallhackEnabled = false
+local originalTransparency = {}
+local originalMaterial = {}
+local wallhackParts = {}
 
--- ===========================
--- PLAYER TAB - PREMIUM DESIGN
--- ===========================
-local PlayerTab = Window:MakeTab({ Name = "⚡│Player", Icon = "rbxassetid://3926305904" })
-
-PlayerTab:AddSection({ Name = "🎮 Player Movement" })
-
--- Enhanced Noclip with Visual Effects
-local noclipEnabled = false
-local noclipEffect
-PlayerTab:AddToggle({
-    Name = "✨ Noclip",
-    Default = false,
-    Callback = function(v)
-        noclipEnabled = v
-        if v then
-            -- Create noclip visual effect
-            noclipEffect = Instance.new("ParticleEmitter", LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart)
-            if noclipEffect then
-                noclipEffect.Color = ColorSequence.new(Color3.fromRGB(0, 170, 255))
-                noclipEffect.Size = NumberSequence.new(0.5)
-                noclipEffect.Transparency = NumberSequence.new(0.7)
-                noclipEffect.Lifetime = NumberRange.new(0.5)
-                noclipEffect.Rate = 50
-                noclipEffect.VelocitySpread = 180
-            end
-            
-            OrionLib:MakeNotification({
-                Name = "Noclip",
-                Content = "✨ Noclip Enabled - Walk through walls",
-                Image = "rbxassetid://3926307971",
-                Time = 3
-            })
-        elseif noclipEffect then
-            noclipEffect:Destroy()
-        end
-    end
-})
-
--- Enhanced Fly System
-local flyEnabled = false
-local flySpeed = 50
-local flyConnection
-
-local function updateFly()
-    if not flyEnabled or not LocalPlayer.Character then return end
-    
-    local humanoidRootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRootPart then return end
-    
-    local direction = Vector3.zero
-    
-    -- Movement controls
-    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += Camera.CFrame.LookVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= Camera.CFrame.LookVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= Camera.CFrame.RightVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += Camera.CFrame.RightVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then direction += Vector3.new(0, 1, 0) end
-    if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then direction -= Vector3.new(0, 1, 0) end
-    
-    if direction.Magnitude > 0 then
-        direction = direction.Unit * flySpeed
-        humanoidRootPart.Velocity = direction
-    else
-        humanoidRootPart.Velocity = Vector3.new(0, 0, 0)
-    end
-end
-
-PlayerTab:AddToggle({
-    Name = "🕊️ Player Fly",
-    Default = false,
-    Callback = function(v)
-        flyEnabled = v
-        if v then
-            flyConnection = RunService.RenderStepped:Connect(updateFly)
-            OrionLib:MakeNotification({
-                Name = "Flight Mode",
-                Content = "🕊️ Flight Activated! Controls: WASD, Space/Shift",
-                Image = "rbxassetid://3926307971",
-                Time = 4
-            })
-        elseif flyConnection then
-            flyConnection:Disconnect()
-            flyConnection = nil
-        end
-    end
-})
-
-PlayerTab:AddSlider({
-    Name = "🚀 Fly Speed",
-    Min = 10,
-    Max = 200,
-    Default = 50,
-    Color = Color3.fromRGB(0, 170, 255),
-    Increment = 5,
-    ValueName = "Speed",
-    Callback = function(v) flySpeed = v end
-})
-
--- Super Jump
-local superJumpEnabled = false
-local jumpPower = 100
-PlayerTab:AddToggle({
-    Name = "🏃 Super Jump",
-    Default = false,
-    Callback = function(v) superJumpEnabled = v end
-})
-
-PlayerTab:AddSlider({
-    Name = "💪 Jump Power",
-    Min = 50,
-    Max = 500,
-    Default = 100,
-    Color = Color3.fromRGB(255, 200, 0),
-    Increment = 10,
-    ValueName = "Power",
-    Callback = function(v) jumpPower = v end
-})
-
-LocalPlayer.CharacterAdded:Connect(function(char)
-    char:WaitForChild("Humanoid").Jumping:Connect(function()
-        if superJumpEnabled then
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if root then
-                root.Velocity = Vector3.new(root.Velocity.X, jumpPower, root.Velocity.Z)
-            end
-        end
-    end)
-end)
-
-PlayerTab:AddSection({ Name = "🛡️ Protection" })
-
--- God Mode
-local godModeEnabled = false
-PlayerTab:AddToggle({
-    Name = "👑 God Mode",
-    Default = false,
-    Callback = function(v)
-        godModeEnabled = v
-        if v then
-            LocalPlayer.CharacterAdded:Connect(function(char)
-                task.wait(0.5)
-                local humanoid = char:WaitForChild("Humanoid")
-                humanoid.MaxHealth = math.huge
-                humanoid.Health = math.huge
-            end)
-            
-            if LocalPlayer.Character then
-                local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
-                if humanoid then
-                    humanoid.MaxHealth = math.huge
-                    humanoid.Health = math.huge
-                end
-            end
-        end
-    end
-})
-
--- Anti-Taser
-local antiTaserEnabled = false
-PlayerTab:AddToggle({
-    Name = "⚡ Anti-Taser",
-    Default = false,
-    Callback = function(v)
-        antiTaserEnabled = v
-    end
-})
-
--- Click Delete
-local clickDeleteEnabled = false
-local mouse = LocalPlayer:GetMouse()
-PlayerTab:AddToggle({
-    Name = "🗑️ Click Delete",
-    Default = false,
-    Callback = function(v)
-        clickDeleteEnabled = v
-        if v then
-            OrionLib:MakeNotification({
-                Name = "Click Delete",
-                Content = "🗑️ Click objects to delete them",
-                Time = 3
-            })
-        end
-    end
-})
-
-mouse.Button1Down:Connect(function()
-    if clickDeleteEnabled and mouse.Target then
-        mouse.Target:Destroy()
-    end
-end)
-
--- ===========================
--- VEHICLE TAB - PREMIUM DESIGN
--- ===========================
-local VehicleTab = Window:MakeTab({ Name = "🚗│Vehicle", Icon = "rbxassetid://3926307971" })
-
-VehicleTab:AddSection({ Name = "🚀 Vehicle Flight" })
-
--- Enhanced Vehicle Fly
-local vehicleFlyEnabled = false
-local vehicleFlySpeed = 100
-local vehicleFlyConnection
-
-local function updateVehicleFly()
-    if not vehicleFlyEnabled then return end
-    
-    local character = LocalPlayer.Character
-    if not character then return end
-    
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then return end
-    
-    local seat = humanoid.SeatPart
-    if not seat or seat.Name ~= "DriveSeat" then return end
-    
-    local vehicle = seat.Parent
-    if not vehicle then return end
-    
-    if not vehicle.PrimaryPart then
-        vehicle.PrimaryPart = seat
-    end
-    
-    -- Movement controls
-    local direction = Vector3.zero
-    if UserInputService:IsKeyDown(Enum.KeyCode.W) then direction += Camera.CFrame.LookVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.S) then direction -= Camera.CFrame.LookVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.A) then direction -= Camera.CFrame.RightVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.D) then direction += Camera.CFrame.RightVector end
-    if UserInputService:IsKeyDown(Enum.KeyCode.E) then direction += Vector3.new(0, 1, 0) end
-    if UserInputService:IsKeyDown(Enum.KeyCode.Q) then direction -= Vector3.new(0, 1, 0) end
-    
-    if direction.Magnitude > 0 then
-        direction = direction.Unit * vehicleFlySpeed
-        vehicle:PivotTo(vehicle:GetPivot() + direction * 0.05)
+WallhackTab.Toggle({
+    Text = "🔍 Wallhack Aktivieren",
+    Callback = function(state)
+        wallhackEnabled = state
         
-        -- Smooth flight
-        for _, part in ipairs(vehicle:GetDescendants()) do
-            if part:IsA("BasePart") then
-                part.Velocity = Vector3.new(0, 0, 0)
-                part.RotVelocity = Vector3.new(0, 0, 0)
-            end
-        end
-    end
-end
-
-VehicleTab:AddToggle({
-    Name = "🚀 Vehicle Fly",
-    Default = false,
-    Callback = function(v)
-        vehicleFlyEnabled = v
-        if v then
-            vehicleFlyConnection = RunService.RenderStepped:Connect(updateVehicleFly)
-            OrionLib:MakeNotification({
-                Name = "Vehicle Fly",
-                Content = "🚀 Vehicle Flight Activated!",
-                Time = 3
-            })
-        elseif vehicleFlyConnection then
-            vehicleFlyConnection:Disconnect()
-            vehicleFlyConnection = nil
-        end
-    end
-})
-
-VehicleTab:AddSlider({
-    Name = "⚡ Flight Speed",
-    Min = 10,
-    Max = 500,
-    Default = 100,
-    Color = Color3.fromRGB(0, 255, 100),
-    Increment = 10,
-    ValueName = "Speed",
-    Callback = function(v) vehicleFlySpeed = v end
-})
-
-VehicleTab:AddSection({ Name = "🎨 Vehicle Customization" })
-
--- Rainbow Vehicle
-local rainbowVehicleEnabled = false
-VehicleTab:AddToggle({
-    Name = "🌈 Rainbow Vehicle",
-    Default = false,
-    Callback = function(v)
-        rainbowVehicleEnabled = v
-        if v then
+        if state then
+            -- Durchsichtige Wände aktivieren
             spawn(function()
-                while rainbowVehicleEnabled do
-                    local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
-                    if vehicle then
-                        local hue = tick() % 5 / 5
-                        local color = Color3.fromHSV(hue, 1, 1)
+                for _, part in pairs(Workspace:GetDescendants()) do
+                    if part:IsA("BasePart") and part.Transparency < 0.9 then
+                        -- Wände, Böden, Decken erkennen
+                        local isWall = part.Name:lower():find("wall") 
+                        or part.Name:lower():find("floor") 
+                        or part.Name:lower():find("ceiling")
+                        or part.Name:lower():find("roof")
+                        or part.Name:lower():find("building")
+                        or part.Name:lower():find("house")
                         
-                        for _, part in ipairs(vehicle:GetDescendants()) do
-                            if part:IsA("BasePart") then
-                                part.Color = color
-                                part.Material = Enum.Material.Neon
-                            end
+                        if isWall then
+                            table.insert(wallhackParts, part)
+                            originalTransparency[part] = part.Transparency
+                            originalMaterial[part] = part.Material
+                            
+                            part.Transparency = 0.7
+                            part.Material = Enum.Material.Glass
                         end
                     end
-                    task.wait(0.1)
                 end
             end)
+            
+            -- Alle neuen Teile auch durchsichtig machen
+            Workspace.DescendantAdded:Connect(function(part)
+                if wallhackEnabled and part:IsA("BasePart") then
+                    local isWall = part.Name:lower():find("wall") 
+                    or part.Name:lower():find("floor") 
+                    or part.Name:lower():find("ceiling")
+                    or part.Name:lower():find("building")
+                    
+                    if isWall then
+                        task.wait(0.1)
+                        part.Transparency = 0.7
+                        part.Material = Enum.Material.Glass
+                    end
+                end
+            end)
+        else
+            -- Zurück zur normalen Sicht
+            for part, transparency in pairs(originalTransparency) do
+                if part and part.Parent then
+                    part.Transparency = transparency
+                    part.Material = originalMaterial[part] or Enum.Material.Plastic
+                end
+            end
+            wallhackParts = {}
+            originalTransparency = {}
+            originalMaterial = {}
         end
-    end
+    end,
+    Enabled = false
 })
 
--- Vehicle God Mode
-VehicleTab:AddButton({
-    Name = "👑 Vehicle God Mode",
-    Callback = function()
-        local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
-        if vehicle then
-            vehicle:SetAttribute("CurrentHealth", math.huge)
-            vehicle:SetAttribute("IsOn", true)
-            OrionLib:MakeNotification({
-                Name = "Vehicle God",
-                Content = "👑 Vehicle God Mode Activated!",
-                Time = 3
-            })
+WallhackTab.Slider({
+    Text = "Transparenz Level",
+    Callback = function(value)
+        if wallhackEnabled then
+            for _, part in pairs(wallhackParts) do
+                if part and part.Parent then
+                    part.Transparency = value / 100
+                end
+            end
         end
-    end
-})
-
--- Infinite Fuel
-VehicleTab:AddButton({
-    Name = "⛽ Infinite Fuel",
-    Callback = function()
-        local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
-        if vehicle then
-            vehicle:SetAttribute("CurrentFuel", math.huge)
-            OrionLib:MakeNotification({
-                Name = "Fuel",
-                Content = "⛽ Infinite Fuel Activated!",
-                Time = 3
-            })
-        end
-    end
+    end,
+    Min = 10,
+    Max = 90,
+    Def = 70
 })
 
 -- ===========================
--- TELEPORT TAB - PREMIUM DESIGN
+-- PLAYER TELEPORT
 -- ===========================
-local TeleportTab = Window:MakeTab({ Name = "🌀│Teleport", Icon = "rbxassetid://3926305904" })
+local TeleportTab = Window.New({
+    Title = "🌀 Spieler Teleport"
+})
 
-TeleportTab:AddSection({ Name = "📍 Quick Teleports" })
-
--- Instant teleport function
-local function instantTeleport(cframe)
-    local character = LocalPlayer.Character
-    if not character then return end
-    
-    local root = character:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    
-    -- Teleport instantly
-    root.CFrame = cframe
-    
-    -- If in vehicle, bring vehicle too
-    local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
-    if vehicle then
-        if not vehicle.PrimaryPart then
-            local driveSeat = vehicle:FindFirstChild("DriveSeat")
-            if driveSeat then vehicle.PrimaryPart = driveSeat end
-        end
-        
-        if vehicle.PrimaryPart then
-            vehicle:PivotTo(cframe)
-        end
-    end
-end
-
--- Location database
-local locations = {
-    ["🏦 Bank"] = CFrame.new(-1198.693, 7.978, 3161.448),
-    ["💎 Jewellery"] = CFrame.new(-407.536, 21.95, 3516.854),
-    ["🎪 Club"] = CFrame.new(-1856.962, 5.706, 2990.518),
-    ["👮 Police Station"] = CFrame.new(-1658.072, 5.63, 2737.27),
-    ["🏥 Hospital"] = CFrame.new(-278.834, 7.745, 1085.797),
-    ["🚒 Fire Station"] = CFrame.new(-1025.361, 4.5, 3899.155),
-    ["🔧 Tuning Garage"] = CFrame.new(-1438.654, 5.63, 118.45),
-    ["🚗 Dealership"] = CFrame.new(-1415.699, 4.552, 940.526),
-    ["🚛 Truck Company"] = CFrame.new(704.451, 4.229, 1479.927),
-    ["🚌 Bus Company"] = CFrame.new(-1682.297, 8.779, -1273.078),
-    ["⛽ Gas Station 1"] = CFrame.new(-1560.674, 3.944, 3813.656),
-    ["⛽ Gas Station 2"] = CFrame.new(-824.447, 4.182, 1512.941),
-    ["🔫 Smuggler"] = CFrame.new(796.557, -18.67, -1526.379),
-    ["🚢 Container Ship"] = CFrame.new(1191.836, 29.55, 2140.703),
-    ["👕 Clothing Store"] = CFrame.new(440.4, 5.52, -1438.111),
-    ["⚓ Prison Entrance"] = CFrame.new(-615.58, 5.29, 2862.237),
-    ["⚓ Prison Inside"] = CFrame.new(-572.106, 6.382, 3061.374),
-    ["💰 Farming Spot"] = CFrame.new(-1148.454, 9.49, 2805.56),
-}
-
--- Create teleport buttons
-for name, cframe in pairs(locations) do
-    TeleportTab:AddButton({
-        Name = "🌀 " .. name,
-        Callback = function()
-            instantTeleport(cframe)
-            OrionLib:MakeNotification({
-                Name = "Teleport",
-                Content = "📍 Teleported to " .. name:gsub("^🌀 ", ""),
-                Time = 2
-            })
-        end
-    })
-end
-
-TeleportTab:AddSection({ Name = "🎯 Player Teleport" })
-
--- Player teleport dropdown
+-- Spielerliste für Dropdown
 local playerList = {}
-local playerDropdown = TeleportTab:AddDropdown({
-    Name = "👤 Select Player",
-    Default = "Select Player",
-    Options = {"Select Player"},
-    Callback = function(selected)
-        if selected ~= "Select Player" then
-            local targetPlayer = Players[selected]
+for _, player in pairs(Players:GetPlayers()) do
+    if player ~= LocalPlayer then
+        table.insert(playerList, player.Name)
+    end
+end
+
+local selectedPlayer = nil
+
+TeleportTab.Dropdown({
+    Text = "🎯 Wähle Spieler",
+    Callback = function(value)
+        selectedPlayer = value
+    end,
+    Options = playerList
+})
+
+-- Spielerliste aktualisieren
+Players.PlayerAdded:Connect(function(player)
+    if player ~= LocalPlayer then
+        table.insert(playerList, player.Name)
+        TeleportTab.Dropdown({
+            Text = "🎯 Wähle Spieler",
+            Callback = function(value)
+                selectedPlayer = value
+            end,
+            Options = playerList
+        })
+    end
+end)
+
+Players.PlayerRemoving:Connect(function(player)
+    for i, name in ipairs(playerList) do
+        if name == player.Name then
+            table.remove(playerList, i)
+            break
+        end
+    end
+end)
+
+-- Teleport-Funktionen
+TeleportTab.Button({
+    Text = "📍 Zu Spieler teleportieren",
+    Callback = function()
+        if selectedPlayer then
+            local targetPlayer = Players[selectedPlayer]
             if targetPlayer and targetPlayer.Character then
-                local root = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
-                if root then
-                    instantTeleport(root.CFrame + Vector3.new(0, 5, 0))
-                    OrionLib:MakeNotification({
-                        Name = "Player Teleport",
-                        Content = "👤 Teleported to " .. selected,
-                        Time = 2
+                local targetPos = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if targetPos then
+                    -- Sanfte Teleportation mit Tween
+                    local character = LocalPlayer.Character
+                    if character then
+                        local hrp = character:FindFirstChild("HumanoidRootPart")
+                        if hrp then
+                            local distance = (hrp.Position - targetPos.Position).Magnitude
+                            local tweenTime = math.min(distance / 100, 2)
+                            
+                            local tweenInfo = TweenInfo.new(tweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                            local goal = {}
+                            goal.CFrame = targetPos.CFrame * CFrame.new(0, 0, 5)
+                            
+                            local tween = TweenService:Create(hrp, tweenInfo, goal)
+                            tween:Play()
+                            
+                            Material.Banner({
+                                Text = "Zu " .. selectedPlayer .. " teleportiert",
+                                Time = 3
+                            })
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+TeleportTab.Button({
+    Text = "🎯 Spieler zu mir teleportieren",
+    Callback = function()
+        if selectedPlayer then
+            local targetPlayer = Players[selectedPlayer]
+            if targetPlayer and targetPlayer.Character then
+                local character = LocalPlayer.Character
+                if character then
+                    local hrp = character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local targetHrp = targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if targetHrp then
+                            local distance = (hrp.Position - targetHrp.Position).Magnitude
+                            local tweenTime = math.min(distance / 100, 2)
+                            
+                            local tweenInfo = TweenInfo.new(tweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                            local goal = {}
+                            goal.CFrame = hrp.CFrame * CFrame.new(0, 0, 5)
+                            
+                            local tween = TweenService:Create(targetHrp, tweenInfo, goal)
+                            tween:Play()
+                            
+                            Material.Banner({
+                                Text = selectedPlayer .. " zu dir teleportiert",
+                                Time = 3
+                            })
+                        end
+                    end
+                end
+            end
+        end
+    end
+})
+
+TeleportTab.Button({
+    Text = "👁️ Zum Spieler-Camera-Fokus",
+    Callback = function()
+        if selectedPlayer then
+            local targetPlayer = Players[selectedPlayer]
+            if targetPlayer and targetPlayer.Character then
+                local targetPos = targetPlayer.Character:FindFirstChild("Head") or 
+                                 targetPlayer.Character:FindFirstChild("HumanoidRootPart")
+                if targetPos then
+                    Camera.CameraSubject = targetPos
+                    Camera.CFrame = CFrame.new(targetPos.Position + Vector3.new(0, 5, 10), targetPos.Position)
+                    
+                    Material.Banner({
+                        Text = "Auf " .. selectedPlayer + " fokussiert",
+                        Time = 3
                     })
                 end
             end
@@ -502,68 +263,184 @@ local playerDropdown = TeleportTab:AddDropdown({
     end
 })
 
--- Update player list
-local function updatePlayerList()
-    local options = {"Select Player"}
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            table.insert(options, player.Name)
-        end
-    end
-    playerDropdown:Refresh(options, true)
-end
-
-Players.PlayerAdded:Connect(updatePlayerList)
-Players.PlayerRemoving:Connect(updatePlayerList)
-updatePlayerList()
-
--- Nearest Dealer
-TeleportTab:AddButton({
-    Name = "🌀 Nearest Dealer",
-    Callback = function()
-        local dealers = Workspace:FindFirstChild("Dealers")
-        if dealers then
-            local nearest = nil
-            local nearestDist = math.huge
-            local charPos = LocalPlayer.Character.HumanoidRootPart.Position
-            
-            for _, dealer in ipairs(dealers:GetChildren()) do
-                if dealer:FindFirstChild("Head") then
-                    local dist = (dealer.Head.Position - charPos).Magnitude
-                    if dist < nearestDist then
-                        nearestDist = dist
-                        nearest = dealer
-                    end
-                end
-            end
-            
-            if nearest then
-                instantTeleport(nearest.Head.CFrame + Vector3.new(0, 5, 0))
-                OrionLib:MakeNotification({
-                    Name = "Dealer Teleport",
-                    Content = "📍 Teleported to nearest dealer",
-                    Time = 2
-                })
-            end
-        end
-    end
+-- ===========================
+-- PLAYER FUNCTIONS
+-- ===========================
+local PlayerTab = Window.New({
+    Title = "⚙️ Player"
 })
 
--- ===========================
-## ESP TAB - PREMIUM DESIGN
--- ===========================
-local ESPTab = Window:MakeTab({ Name = "👁️│ESP", Icon = "rbxassetid://3926305904" })
+-- Noclip
+local noclipEnabled = false
+local noclipConnection
 
-ESPTab:AddSection({ Name = "🎯 ESP Settings" })
+PlayerTab.Toggle({
+    Text = "🚫 Noclip",
+    Callback = function(state)
+        noclipEnabled = state
+        if state then
+            noclipConnection = RunService.Stepped:Connect(function()
+                if LocalPlayer.Character then
+                    for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        elseif noclipConnection then
+            noclipConnection:Disconnect()
+        end
+    end,
+    Enabled = false
+})
 
--- Enhanced ESP System
+-- Fly
+local flyEnabled = false
+local flySpeed = 50
+local flyConnection
+
+PlayerTab.Toggle({
+    Text = "✈️ Player Fly",
+    Callback = function(state)
+        flyEnabled = state
+        if state then
+            flyConnection = RunService.RenderStepped:Connect(function()
+                if flyEnabled and LocalPlayer.Character then
+                    local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    if hrp then
+                        local cam = Workspace.CurrentCamera
+                        local direction = Vector3.zero
+                        
+                        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                            direction = direction + cam.CFrame.LookVector
+                        end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                            direction = direction - cam.CFrame.LookVector
+                        end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                            direction = direction - cam.CFrame.RightVector
+                        end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                            direction = direction + cam.CFrame.RightVector
+                        end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                            direction = direction + Vector3.new(0, 1, 0)
+                        end
+                        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                            direction = direction - Vector3.new(0, 1, 0)
+                        end
+                        
+                        if direction.Magnitude > 0 then
+                            direction = direction.Unit * flySpeed
+                        end
+                        
+                        hrp.Velocity = direction
+                    end
+                end
+            end)
+        elseif flyConnection then
+            flyConnection:Disconnect()
+        end
+    end,
+    Enabled = false
+})
+
+PlayerTab.Slider({
+    Text = "Flug Geschwindigkeit",
+    Callback = function(value)
+        flySpeed = value
+    end,
+    Min = 10,
+    Max = 200,
+    Def = 50
+})
+
+-- Anti-Fall/Damage
+local antiFallEnabled = false
+local antiFallConnection
+
+PlayerTab.Toggle({
+    Text = "🛡️ Anti-Fall/Damage",
+    Callback = function(state)
+        antiFallEnabled = state
+        if state then
+            antiFallConnection = RunService.Heartbeat:Connect(function()
+                if LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                    
+                    if humanoid and hrp then
+                        if hrp.Velocity.Y < -50 then
+                            hrp.Velocity = Vector3.new(hrp.Velocity.X, -20, hrp.Velocity.Z)
+                        end
+                        
+                        if humanoid.Health < 30 then
+                            humanoid.Health = humanoid.MaxHealth
+                        end
+                    end
+                end
+            end)
+        elseif antiFallConnection then
+            antiFallConnection:Disconnect()
+        end
+    end,
+    Enabled = false
+})
+
+-- Anti-Taser
+local antiTaserEnabled = false
+
+PlayerTab.Toggle({
+    Text = "⚡ Anti-Taser",
+    Callback = function(state)
+        antiTaserEnabled = state
+        if state then
+            LocalPlayer.CharacterAdded:Connect(function(char)
+                task.wait(0.5)
+                local humanoid = char:WaitForChild("Humanoid")
+                humanoid:GetPropertyChangedSignal("PlatformStand"):Connect(function()
+                    if humanoid.PlatformStand then
+                        humanoid.PlatformStand = false
+                        humanoid:ChangeState(Enum.HumanoidStateType.Running)
+                    end
+                end)
+            end)
+        end
+    end,
+    Enabled = false
+})
+
+-- Click to Delete
+local deleteEnabled = false
+local mouse = LocalPlayer:GetMouse()
+
+PlayerTab.Toggle({
+    Text = "❌ Click to Delete",
+    Callback = function(state)
+        deleteEnabled = state
+    end,
+    Enabled = false
+})
+
+mouse.Button1Down:Connect(function()
+    if deleteEnabled and mouse.Target then
+        mouse.Target:Destroy()
+    end
+end)
+
+-- ===========================
+-- ESP SYSTEM
+-- ===========================
+local ESPTab = Window.New({
+    Title = "👁️ ESP"
+})
+
 local espEnabled = false
-local espBoxes = {}
-local espHealthBars = {}
-local espNames = {}
-local espTracers = {}
+local boxes = {}
+local names = {}
+local healthbars = {}
 
--- Create ESP for player
 local function createESP(player)
     if player == LocalPlayer then return end
     
@@ -574,85 +451,85 @@ local function createESP(player)
     box.Color = Color3.new(1, 0, 0)
     box.Filled = false
     
-    -- Health Bar
-    local healthBar = Drawing.new("Square")
-    healthBar.Visible = false
-    healthBar.Thickness = 1
-    healthBar.Color = Color3.new(0, 1, 0)
-    healthBar.Filled = true
-    
     -- Name
-    local nameLabel = Drawing.new("Text")
-    nameLabel.Visible = false
-    nameLabel.Color = Color3.new(1, 1, 1)
-    nameLabel.Size = 14
-    nameLabel.Outline = true
-    nameLabel.Text = player.Name
+    local name = Drawing.new("Text")
+    name.Visible = false
+    name.Color = Color3.new(1, 1, 1)
+    name.Size = 14
+    name.Center = true
+    name.Outline = true
+    name.Text = player.Name
     
-    -- Tracer
-    local tracer = Drawing.new("Line")
-    tracer.Visible = false
-    tracer.Thickness = 1
-    tracer.Color = Color3.new(1, 1, 0)
+    -- Health Bar
+    local healthbar = Drawing.new("Square")
+    healthbar.Visible = false
+    healthbar.Thickness = 1
+    healthbar.Filled = true
     
-    espBoxes[player] = box
-    espHealthBars[player] = healthBar
-    espNames[player] = nameLabel
-    espTracers[player] = tracer
+    boxes[player] = box
+    names[player] = name
+    healthbars[player] = healthbar
 end
 
--- Update ESP
 local function updateESP()
-    for player, box in pairs(espBoxes) do
-        if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("HumanoidRootPart") then
+    for player, box in pairs(boxes) do
+        if player.Character and player.Character:FindFirstChild("Humanoid") and 
+           player.Character:FindFirstChild("HumanoidRootPart") then
+           
             local rootPart = player.Character.HumanoidRootPart
             local humanoid = player.Character.Humanoid
             local screenPos, onScreen = Camera:WorldToViewportPoint(rootPart.Position)
             
-            if onScreen then
+            if onScreen and espEnabled then
                 -- Box
-                local boxSize = Vector2.new(40, 60)
+                local boxSize = Vector2.new(30, 50)
                 box.Size = boxSize
                 box.Position = Vector2.new(screenPos.X - boxSize.X/2, screenPos.Y - boxSize.Y/2)
-                box.Visible = espEnabled
-                box.Color = player.Team and player.Team.TeamColor.Color or Color3.new(1, 0, 0)
+                box.Visible = true
+                
+                -- Name
+                names[player].Position = Vector2.new(screenPos.X, screenPos.Y - 30)
+                names[player].Visible = true
                 
                 -- Health Bar
                 local healthPercent = humanoid.Health / humanoid.MaxHealth
-                local healthBarHeight = 60 * healthPercent
-                local healthBar = espHealthBars[player]
-                healthBar.Size = Vector2.new(4, healthBarHeight)
-                healthBar.Position = Vector2.new(screenPos.X - 25, screenPos.Y + 30 - healthBarHeight)
-                healthBar.Color = Color3.fromHSV(healthPercent * 0.3, 1, 1)
-                healthBar.Visible = espEnabled
-                
-                -- Name
-                local nameLabel = espNames[player]
-                nameLabel.Position = Vector2.new(screenPos.X, screenPos.Y - 35)
-                nameLabel.Visible = espEnabled
-                
-                -- Tracer
-                local tracer = espTracers[player]
-                tracer.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y)
-                tracer.To = Vector2.new(screenPos.X, screenPos.Y)
-                tracer.Visible = espEnabled
+                local healthbarHeight = 50 * healthPercent
+                healthbars[player].Size = Vector2.new(4, healthbarHeight)
+                healthbars[player].Position = Vector2.new(screenPos.X - 25, screenPos.Y + 25 - healthbarHeight)
+                healthbars[player].Color = Color3.fromHSV(healthPercent * 0.3, 1, 1)
+                healthbars[player].Visible = true
             else
                 box.Visible = false
-                if espHealthBars[player] then espHealthBars[player].Visible = false end
-                if espNames[player] then espNames[player].Visible = false end
-                if espTracers[player] then espTracers[player].Visible = false end
+                names[player].Visible = false
+                healthbars[player].Visible = false
             end
         else
             box.Visible = false
-            if espHealthBars[player] then espHealthBars[player].Visible = false end
-            if espNames[player] then espNames[player].Visible = false end
-            if espTracers[player] then espTracers[player].Visible = false end
+            names[player].Visible = false
+            healthbars[player].Visible = false
         end
     end
 end
 
+-- ESP Toggle
+ESPTab.Toggle({
+    Text = "📦 Box ESP",
+    Callback = function(state)
+        espEnabled = state
+        if state then
+            RunService:BindToRenderStep("ESPUpdate", Enum.RenderPriority.First.Value + 1, updateESP)
+        else
+            RunService:UnbindFromRenderStep("ESPUpdate")
+            for _, box in pairs(boxes) do box.Visible = false end
+            for _, name in pairs(names) do name.Visible = false end
+            for _, healthbar in pairs(healthbars) do healthbar.Visible = false end
+        end
+    end,
+    Enabled = false
+})
+
 -- Initialize ESP
-for _, player in ipairs(Players:GetPlayers()) do
+for _, player in pairs(Players:GetPlayers()) do
     createESP(player)
 end
 
@@ -661,108 +538,237 @@ Players.PlayerAdded:Connect(function(player)
 end)
 
 Players.PlayerRemoving:Connect(function(player)
-    if espBoxes[player] then espBoxes[player]:Remove() end
-    if espHealthBars[player] then espHealthBars[player]:Remove() end
-    if espNames[player] then espNames[player]:Remove() end
-    if espTracers[player] then espTracers[player]:Remove() end
-    espBoxes[player] = nil
-    espHealthBars[player] = nil
-    espNames[player] = nil
-    espTracers[player] = nil
+    if boxes[player] then boxes[player]:Remove() end
+    if names[player] then names[player]:Remove() end
+    if healthbars[player] then healthbars[player]:Remove() end
+    boxes[player] = nil
+    names[player] = nil
+    healthbars[player] = nil
 end)
 
-ESPTab:AddToggle({
-    Name = "👁️ Enable ESP",
-    Default = false,
-    Callback = function(v)
-        espEnabled = v
-        if v then
-            RunService:BindToRenderStep("ESPUpdate", Enum.RenderPriority.First.Value + 1, updateESP)
-            OrionLib:MakeNotification({
-                Name = "ESP",
-                Content = "👁️ ESP System Activated!",
+-- ===========================
+-- CAR MODIFICATIONS
+-- ===========================
+local CarTab = Window.New({
+    Title = "🚗 Auto"
+})
+
+-- Car Fly
+local carFlyEnabled = false
+local carFlySpeed = 100
+local carFlyConnection
+
+CarTab.Toggle({
+    Text = "✈️ Auto Fly",
+    Callback = function(state)
+        carFlyEnabled = state
+        if state then
+            carFlyConnection = RunService.RenderStepped:Connect(function()
+                if carFlyEnabled and LocalPlayer.Character then
+                    local humanoid = LocalPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        local seat = humanoid.SeatPart
+                        if seat and seat.Name == "DriveSeat" then
+                            local vehicle = seat.Parent
+                            if vehicle then
+                                if not vehicle.PrimaryPart then
+                                    vehicle.PrimaryPart = seat
+                                end
+                                
+                                local direction = Vector3.zero
+                                local cam = Workspace.CurrentCamera
+                                
+                                if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                                    direction = direction + cam.CFrame.LookVector
+                                end
+                                if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                                    direction = direction - cam.CFrame.LookVector
+                                end
+                                if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                                    direction = direction - cam.CFrame.RightVector
+                                end
+                                if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                                    direction = direction + cam.CFrame.RightVector
+                                end
+                                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                                    direction = direction + Vector3.new(0, 1, 0)
+                                end
+                                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+                                    direction = direction - Vector3.new(0, 1, 0)
+                                end
+                                
+                                if direction.Magnitude > 0 then
+                                    direction = direction.Unit * carFlySpeed
+                                    vehicle:PivotTo(vehicle:GetPivot() + direction * 0.05)
+                                    
+                                    for _, part in pairs(vehicle:GetDescendants()) do
+                                        if part:IsA("BasePart") then
+                                            part.Velocity = Vector3.zero
+                                            part.RotVelocity = Vector3.zero
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        elseif carFlyConnection then
+            carFlyConnection:Disconnect()
+        end
+    end,
+    Enabled = false
+})
+
+CarTab.Slider({
+    Text = "Flug Geschwindigkeit",
+    Callback = function(value)
+        carFlySpeed = value
+    end,
+    Min = 10,
+    Max = 500,
+    Def = 100
+})
+
+-- Car God Mode
+CarTab.Button({
+    Text = "🛡️ Auto God Mode",
+    Callback = function()
+        local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
+        if vehicle then
+            vehicle:SetAttribute("CurrentHealth", math.huge)
+            vehicle:SetAttribute("IsOn", true)
+            Material.Banner({
+                Text = "Auto God Mode aktiviert",
                 Time = 3
             })
-        else
-            RunService:UnbindFromRenderStep("ESPUpdate")
-            for _, box in pairs(espBoxes) do box.Visible = false end
-            for _, bar in pairs(espHealthBars) do bar.Visible = false end
-            for _, name in pairs(espNames) do name.Visible = false end
-            for _, tracer in pairs(espTracers) do tracer.Visible = false end
         end
     end
 })
 
--- Wanted ESP
-local wantedESPEnabled = false
-ESPTab:AddToggle({
-    Name = "👮 Wanted ESP",
-    Default = false,
-    Callback = function(v)
-        wantedESPEnabled = v
-    end
-})
-
--- Crime ESP
-local crimeESPEnabled = false
-ESPTab:AddToggle({
-    Name = "⚖️ Crime ESP",
-    Default = false,
-    Callback = function(v)
-        crimeESPEnabled = v
-    end
-})
-
--- ===========================
-## AIMBOT TAB - PREMIUM DESIGN WITH WALLHACK
--- ===========================
-local AimbotTab = Window:MakeTab({ Name = "🎯│Aimbot", Icon = "rbxassetid://3926307971" })
-
-AimbotTab:AddSection({ Name = "🎯 Aimbot Settings" })
-
--- Wall Hack (Make walls transparent)
-local wallHackEnabled = false
-local originalTransparency = {}
-
-AimbotTab:AddToggle({
-    Name = "🌉 Wall Hack (See Through Walls)",
-    Default = false,
-    Callback = function(v)
-        wallHackEnabled = v
-        if v then
-            -- Make walls transparent
-            for _, part in ipairs(Workspace:GetDescendants()) do
-                if part:IsA("BasePart") and part.Transparency < 0.5 then
-                    originalTransparency[part] = part.Transparency
-                    part.Transparency = 0.8
-                    part.Material = Enum.Material.Glass
-                end
-            end
-            OrionLib:MakeNotification({
-                Name = "Wall Hack",
-                Content = "🌉 Walls are now transparent!",
+-- Infinite Fuel
+CarTab.Button({
+    Text = "⛽ Unendlich Benzin",
+    Callback = function()
+        local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
+        if vehicle then
+            vehicle:SetAttribute("CurrentFuel", math.huge)
+            Material.Banner({
+                Text = "Unendlich Benzin aktiviert",
                 Time = 3
             })
-        else
-            -- Restore original transparency
-            for part, transparency in pairs(originalTransparency) do
-                if part and part.Parent then
-                    part.Transparency = transparency
-                    part.Material = Enum.Material.Plastic
-                end
-            end
-            originalTransparency = {}
         end
     end
 })
 
--- Enhanced Aimbot
+-- Rainbow Car
+local rainbowCar = false
+
+CarTab.Toggle({
+    Text = "🌈 Regenbogen Auto",
+    Callback = function(state)
+        rainbowCar = state
+        if state then
+            spawn(function()
+                while rainbowCar do
+                    local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
+                    if vehicle then
+                        local hue = tick() % 5 / 5
+                        local color = Color3.fromHSV(hue, 1, 1)
+                        
+                        for _, part in pairs(vehicle:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.Color = color
+                                part.Material = Enum.Material.Neon
+                            end
+                        end
+                    end
+                    task.wait(0.1)
+                end
+            end)
+        end
+    end,
+    Enabled = false
+})
+
+-- ===========================
+-- LOCATION TELEPORT
+-- ===========================
+local LocationTab = Window.New({
+    Title = "📍 Orte"
+})
+
+local locations = {
+    ["🏦 Bank"] = CFrame.new(-1198.693, 7.978, 3161.448),
+    ["👮 Polizei"] = CFrame.new(-1658.072, 5.63, 2737.27),
+    ["🏥 Krankenhaus"] = CFrame.new(-278.834, 7.745, 1085.797),
+    ["🔧 Tuning"] = CFrame.new(-1438.654, 5.63, 118.45),
+    ["🚒 Feuerwehr"] = CFrame.new(-1025.361, 4.5, 3899.155),
+    ["💎 Juwelier"] = CFrame.new(-407.536, 21.95, 3516.854),
+    ["🛒 Autohaus"] = CFrame.new(-1415.699, 4.552, 940.526),
+    ["⛽ Tankstelle"] = CFrame.new(-1560.674, 3.944, 3813.656),
+    ["🚢 Hafen"] = CFrame.new(1191.836, 29.55, 2140.703),
+    ["👕 Kleidung"] = CFrame.new(440.4, 5.52, -1438.111),
+    ["🚚 LKW Firma"] = CFrame.new(704.451, 4.229, 1479.927),
+    ["🚌 Bus Firma"] = CFrame.new(-1682.297, 8.779, -1273.078),
+    ["🏢 Gefängnis"] = CFrame.new(-615.58, 5.29, 2862.237),
+    ["🎮 Arcade"] = CFrame.new(-1856.962, 5.706, 2990.518),
+    ["🛠️ Werkzeug"] = CFrame.new(-767.815, 4.374, 663.494),
+}
+
+for locationName, locationCFrame in pairs(locations) do
+    LocationTab.Button({
+        Text = locationName,
+        Callback = function()
+            local character = LocalPlayer.Character
+            if character then
+                local hrp = character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local vehicle = Workspace.Vehicles:FindFirstChild(LocalPlayer.Name)
+                    
+                    if vehicle then
+                        -- Mit Auto teleportieren
+                        if not vehicle.PrimaryPart then
+                            local driveSeat = vehicle:FindFirstChild("DriveSeat")
+                            if driveSeat then
+                                vehicle.PrimaryPart = driveSeat
+                            end
+                        end
+                        
+                        if vehicle.PrimaryPart then
+                            local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                            local tween = TweenService:Create(vehicle.PrimaryPart, tweenInfo, {CFrame = locationCFrame})
+                            tween:Play()
+                        end
+                    else
+                        -- Ohne Auto teleportieren
+                        local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                        local tween = TweenService:Create(hrp, tweenInfo, {CFrame = locationCFrame})
+                        tween:Play()
+                    end
+                    
+                    Material.Banner({
+                        Text = "Zu " .. locationName .. " teleportiert",
+                        Time = 3
+                    })
+                end
+            end
+        end
+    })
+end
+
+-- ===========================
+-- AIMBOT
+-- ===========================
+local AimbotTab = Window.New({
+    Title = "🎯 Aimbot"
+})
+
 local aimbotEnabled = false
-local aimbotKey = Enum.KeyCode.V
-local aimbotFOV = 150
-local aimbotSmoothness = 0.15
-local aimbotPart = "Head"
-local wallPenetration = true
+local aimbotFOV = 100
+local aimbotSmooth = 0.2
+local aimPart = "Head"
+local wallbang = true
 
 -- FOV Circle
 local fovCircle = Drawing.new("Circle")
@@ -770,27 +776,73 @@ fovCircle.Visible = false
 fovCircle.Radius = aimbotFOV
 fovCircle.Thickness = 2
 fovCircle.Color = Color3.new(1, 0, 0)
-fovCircle.Transparency = 0.5
 fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
 
--- Find target through walls
+AimbotTab.Toggle({
+    Text = "🎯 Aimbot Aktivieren",
+    Callback = function(state)
+        aimbotEnabled = state
+        fovCircle.Visible = state
+    end,
+    Enabled = false
+})
+
+AimbotTab.Dropdown({
+    Text = "Ziel Körperteil",
+    Callback = function(value)
+        aimPart = value
+    end,
+    Options = {"Head", "HumanoidRootPart", "UpperTorso"}
+})
+
+AimbotTab.Toggle({
+    Text = "🔫 Durch Wände schießen",
+    Callback = function(state)
+        wallbang = state
+    end,
+    Enabled = true
+})
+
+AimbotTab.Slider({
+    Text = "Aimbot FOV",
+    Callback = function(value)
+        aimbotFOV = value
+        fovCircle.Radius = value
+    end,
+    Min = 10,
+    Max = 500,
+    Def = 100
+})
+
+AimbotTab.Slider({
+    Text = "Smoothness",
+    Callback = function(value)
+        aimbotSmooth = value / 100
+    end,
+    Min = 1,
+    Max = 100,
+    Def = 20
+})
+
 local function findTarget()
     local nearestPlayer = nil
     local nearestDistance = aimbotFOV
     
-    for _, player in ipairs(Players:GetPlayers()) do
+    for _, player in pairs(Players:GetPlayers()) do
         if player ~= LocalPlayer and player.Character then
-            local targetPart = player.Character:FindFirstChild(aimbotPart)
+            local targetPart = player.Character:FindFirstChild(aimPart)
             if targetPart then
                 local screenPos, onScreen = Camera:WorldToViewportPoint(targetPart.Position)
-                local mousePos = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
-                local targetPos = Vector2.new(screenPos.X, screenPos.Y)
-                local distance = (mousePos - targetPos).Magnitude
                 
-                -- Allow targeting through walls
-                if distance < nearestDistance then
-                    nearestDistance = distance
-                    nearestPlayer = player
+                if onScreen or wallbang then
+                    local mousePos = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+                    local targetPos = Vector2.new(screenPos.X, screenPos.Y)
+                    local distance = (mousePos - targetPos).Magnitude
+                    
+                    if distance < nearestDistance then
+                        nearestDistance = distance
+                        nearestPlayer = player
+                    end
                 end
             end
         end
@@ -799,505 +851,182 @@ local function findTarget()
     return nearestPlayer
 end
 
--- Aim at target
-local function aimAtTarget()
-    if not aimbotEnabled then return end
-    
-    local target = findTarget()
-    if target and target.Character then
-        local targetPart = target.Character:FindFirstChild(aimbotPart)
-        if targetPart then
-            local targetPosition = targetPart.Position
-            
-            -- Add prediction
-            if targetPart.Velocity.Magnitude > 0 then
-                targetPosition = targetPosition + targetPart.Velocity * 0.15
-            end
-            
-            local currentCFrame = Camera.CFrame
-            local targetCFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
-            
-            -- Smooth aiming
-            Camera.CFrame = currentCFrame:Lerp(targetCFrame, aimbotSmoothness)
-        end
-    end
-end
-
--- Aimbot toggle
-AimbotTab:AddToggle({
-    Name = "🎯 Enable Aimbot",
-    Default = false,
-    Callback = function(v)
-        aimbotEnabled = v
-        fovCircle.Visible = v
-    end
-})
-
--- Aimbot keybind
-AimbotTab:AddBind({
-    Name = "⌨️ Aimbot Keybind",
-    Default = Enum.KeyCode.V,
-    Hold = false,
-    Callback = function()
-        aimbotEnabled = not aimbotEnabled
-        fovCircle.Visible = aimbotEnabled
-    end
-})
-
--- Aim part selection
-AimbotTab:AddDropdown({
-    Name = "🎯 Aim Part",
-    Default = "Head",
-    Options = {"Head", "Torso", "HumanoidRootPart"},
-    Callback = function(v)
-        aimbotPart = v
-    end
-})
-
--- Aimbot FOV
-AimbotTab:AddSlider({
-    Name = "🔘 Aimbot FOV",
-    Min = 10,
-    Max = 500,
-    Default = 150,
-    Color = Color3.fromRGB(255, 0, 0),
-    Increment = 10,
-    ValueName = "FOV",
-    Callback = function(v)
-        aimbotFOV = v
-        fovCircle.Radius = v
-    end
-})
-
--- Smoothness
-AimbotTab:AddSlider({
-    Name = "🌀 Smoothness",
-    Min = 0,
-    Max = 1,
-    Default = 0.15,
-    Color = Color3.fromRGB(0, 170, 255),
-    Increment = 0.05,
-    ValueName = "",
-    Callback = function(v)
-        aimbotSmoothness = v
-    end
-})
-
--- Auto-shoot toggle
-local autoShootEnabled = false
-AimbotTab:AddToggle({
-    Name = "🔫 Auto Shoot",
-    Default = false,
-    Callback = function(v)
-        autoShootEnabled = v
-    end
-})
-
--- Aimbot loop
-RunService.RenderStepped:Connect(function()
+local aimbotConnection
+aimbotConnection = RunService.RenderStepped:Connect(function()
     fovCircle.Position = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
     
-    if aimbotEnabled then
-        aimAtTarget()
-        
-        -- Auto shoot
-        if autoShootEnabled and aimbotEnabled then
-            local character = LocalPlayer.Character
-            if character then
-                local tool = character:FindFirstChildWhichIsA("Tool")
-                if tool then
-                    tool:Activate()
+    if aimbotEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        local target = findTarget()
+        if target and target.Character then
+            local targetPart = target.Character:FindFirstChild(aimPart)
+            if targetPart then
+                local targetPosition = targetPart.Position
+                
+                if targetPart.Velocity.Magnitude > 0 then
+                    targetPosition = targetPosition + targetPart.Velocity * 0.1
                 end
+                
+                local currentCFrame = Camera.CFrame
+                local targetCFrame = CFrame.new(Camera.CFrame.Position, targetPosition)
+                
+                Camera.CFrame = currentCFrame:Lerp(targetCFrame, aimbotSmooth)
             end
         end
     end
 end)
 
 -- ===========================
-## POLICE TAB - PREMIUM DESIGN
+-- MISCELLANEOUS
 -- ===========================
-local PoliceTab = Window:MakeTab({ Name = "👮│Police", Icon = "rbxassetid://3926305904" })
-
-PoliceTab:AddSection({ Name = "📡 Police Tools" })
-
--- Radar Farm
-local radarFarmEnabled = false
-PoliceTab:AddToggle({
-    Name = "📡 Radar Farm",
-    Default = false,
-    Callback = function(v)
-        radarFarmEnabled = v
-        if v then
-            OrionLib:MakeNotification({
-                Name = "Radar Farm",
-                Content = "📡 Farming speeders for money!",
-                Time = 3
-            })
-        end
-    end
+local MiscTab = Window.New({
+    Title = "⚙️ Misc"
 })
 
--- Radar Farm loop
-spawn(function()
-    while true do
-        if radarFarmEnabled then
-            pcall(function()
-                local character = LocalPlayer.Character
-                if character then
-                    local radarGun = character:FindFirstChild("Radar Gun")
-                    if radarGun then
-                        for _, vehicle in ipairs(Workspace.Vehicles:GetChildren()) do
-                            if vehicle:FindFirstChild("DriveSeat") then
-                                local remote = ReplicatedStorage:FindFirstChild("Bnl")
-                                if remote then
-                                    local radarRemote = remote:FindFirstChild("bbb7c252-304d-4582-b2a0-89eb9d3a0855")
-                                    if radarRemote then
-                                        radarRemote:FireServer(radarGun, vehicle.DriveSeat.Position, Vector3.new(0, 0, 0))
+-- Auto Taser
+local autoTaser = false
+
+MiscTab.Toggle({
+    Text = "⚡ Auto Taser",
+    Callback = function(state)
+        autoTaser = state
+        if state then
+            spawn(function()
+                while autoTaser do
+                    local character = LocalPlayer.Character
+                    if character then
+                        local taser = character:FindFirstChild("Taser")
+                        if taser then
+                            for _, player in pairs(Players:GetPlayers()) do
+                                if player ~= LocalPlayer and player.Character then
+                                    local targetRoot = player.Character:FindFirstChild("HumanoidRootPart")
+                                    local charRoot = character:FindFirstChild("HumanoidRootPart")
+                                    
+                                    if targetRoot and charRoot then
+                                        local distance = (targetRoot.Position - charRoot.Position).Magnitude
+                                        if distance < 50 then
+                                            local remote = ReplicatedStorage:FindFirstChild("Bnl")
+                                            if remote then
+                                                local taserRemote = remote:FindFirstChild("c6011f40-2809-4686-a297-33283dd11715")
+                                                if taserRemote then
+                                                    taserRemote:FireServer(taser, targetRoot.Position)
+                                                end
+                                            end
+                                        end
                                     end
                                 end
                             end
                         end
                     end
+                    task.wait(0.5)
                 end
             end)
         end
-        task.wait(1)
-    end
-end)
+    end,
+    Enabled = false
+})
 
--- Auto Arrest
-local autoArrestEnabled = false
-PoliceTab:AddToggle({
-    Name = "👮 Auto Arrest",
-    Default = false,
-    Callback = function(v)
-        autoArrestEnabled = v
-    end
+-- Radar Farm
+local radarFarm = false
+
+MiscTab.Toggle({
+    Text = "📡 Radar Farm",
+    Callback = function(state)
+        radarFarm = state
+        if state then
+            spawn(function()
+                while radarFarm do
+                    local character = LocalPlayer.Character
+                    if character then
+                        local radarGun = character:FindFirstChild("Radar Gun")
+                        if radarGun then
+                            for _, vehicle in pairs(Workspace.Vehicles:GetChildren()) do
+                                if vehicle:FindFirstChild("DriveSeat") then
+                                    local remote = ReplicatedStorage:FindFirstChild("Bnl")
+                                    if remote then
+                                        local radarRemote = remote:FindFirstChild("bbb7c252-304d-4582-b2a0-89eb9d3a0855")
+                                        if radarRemote then
+                                            radarRemote:FireServer(radarGun, vehicle.DriveSeat.Position, Vector3.new(0, 0, 0))
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    task.wait(1)
+                end
+            end)
+        end
+    end,
+    Enabled = false
 })
 
 -- Anti-AFK
-local antiAFKEnabled = false
-PoliceTab:AddToggle({
-    Name = "⏰ Anti-AFK",
-    Default = false,
-    Callback = function(v)
-        antiAFKEnabled = v
-        if v then
-            VirtualUser:CaptureController()
-            VirtualUser:ClickButton2(Vector2.new())
-            OrionLib:MakeNotification({
-                Name = "Anti-AFK",
-                Content = "⏰ You won't be kicked for AFK",
-                Time = 3
-            })
-        end
+MiscTab.Button({
+    Text = "⏰ Anti-AFK Aktivieren",
+    Callback = function()
+        local VirtualUser = game:GetService("VirtualUser")
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+        
+        Material.Banner({
+            Text = "Anti-AFK aktiviert",
+            Time = 3
+        })
     end
 })
 
-PoliceTab:AddSection({ Name = "🚔 Police Teleports" })
-
--- Police locations
-local policeLocations = {
-    ["👮 Police Station"] = CFrame.new(-1670.692, 5.99, 2771.11),
-    ["💰 Farming Spot"] = CFrame.new(-1148.454, 9.49, 2805.56),
-    ["⚓ Prison"] = CFrame.new(-615.58, 5.29, 2862.237),
-    ["🚓 Patrol Start"] = CFrame.new(-1500, 5, 2800),
-}
-
-for name, cframe in pairs(policeLocations) do
-    PoliceTab:AddButton({
-        Name = "📍 " .. name,
-        Callback = function()
-            instantTeleport(cframe)
-            OrionLib:MakeNotification({
-                Name = "Police Teleport",
-                Content = "📍 " .. name,
-                Time = 2
-            })
-        end
-    })
-end
-
--- ===========================
-## SELF REVIVE TAB - PREMIUM DESIGN
--- ===========================
-local ReviveTab = Window:MakeTab({ Name = "💖│Self Revive", Icon = "rbxassetid://3926307971" })
-
-ReviveTab:AddParagraph("💖 Auto Revive System", "Automatically revives you when health is low")
-
--- Auto Revive
-local autoReviveEnabled = false
-local reviveConnection
-
-local function checkHealthAndRevive()
-    local character = LocalPlayer.Character
-    if not character then return end
-    
-    local humanoid = character:FindFirstChild("Humanoid")
-    if not humanoid then return end
-    
-    if humanoid.Health < 30 then
-        -- Teleport to hospital
-        local hospital = Workspace:FindFirstChild("Buildings")
-        if hospital then
-            hospital = hospital:FindFirstChild("Hospital")
-            if hospital then
-                hospital = hospital:FindFirstChild("HospitalBed")
-                if hospital then
-                    instantTeleport(hospital.CFrame + Vector3.new(0, 5, 0))
-                    
-                    task.wait(1)
-                    humanoid.Health = humanoid.MaxHealth
-                    
-                    OrionLib:MakeNotification({
-                        Name = "Auto Revive",
-                        Content = "💖 You have been revived!",
-                        Time = 3
-                    })
-                end
-            end
-        end
-    end
-end
-
-ReviveTab:AddToggle({
-    Name = "💖 Enable Auto Revive",
-    Default = false,
-    Callback = function(v)
-        autoReviveEnabled = v
-        if v then
-            reviveConnection = RunService.Heartbeat:Connect(function()
-                checkHealthAndRevive()
-            end)
-            OrionLib:MakeNotification({
-                Name = "Auto Revive",
-                Content = "💖 Auto Revive Activated!",
-                Time = 3
-            })
-        elseif reviveConnection then
-            reviveConnection:Disconnect()
-            reviveConnection = nil
-        end
-    end
-})
-
--- Instant Revive Button
-ReviveTab:AddButton({
-    Name = "⚡ Instant Revive",
+-- Reset Character
+MiscTab.Button({
+    Text = "🔄 Charakter resetten",
     Callback = function()
         local character = LocalPlayer.Character
         if character then
-            local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid then
-                humanoid.Health = humanoid.MaxHealth
-                OrionLib:MakeNotification({
-                    Name = "Revive",
-                    Content = "⚡ Instant Revive Complete!",
-                    Time = 3
-                })
-            end
+            character:BreakJoints()
         end
     end
 })
 
--- Hospital Teleport
-ReviveTab:AddButton({
-    Name = "🏥 Teleport to Hospital",
+-- ===========================
+-- CREDITS TAB
+-- ===========================
+local CreditsTab = Window.New({
+    Title = "🌟 Credits"
+})
+
+CreditsTab.Label({
+    Text = "Samuel Scripts"
+})
+
+CreditsTab.Label({
+    Text = "Emergency Hamburg"
+})
+
+CreditsTab.Button({
+    Text = "📋 Discord Link kopieren",
     Callback = function()
-        instantTeleport(CFrame.new(-278.834, 7.745, 1085.797))
-        OrionLib:MakeNotification({
-            Name = "Hospital",
-            Content = "🏥 Teleported to Hospital",
-            Time = 2
-        })
-    end
-})
-
--- ===========================
-## VISUAL TAB - PREMIUM EFFECTS
--- ===========================
-local VisualTab = Window:MakeTab({ Name = "✨│Visual", Icon = "rbxassetid://3926305904" })
-
-VisualTab:AddSection({ Name = "🎨 Visual Effects" })
-
--- Night Vision
-local nightVisionEnabled = false
-VisualTab:AddToggle({
-    Name = "🌙 Night Vision",
-    Default = false,
-    Callback = function(v)
-        nightVisionEnabled = v
-        if v then
-            Lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
-            Lighting.Brightness = 2
-            Lighting.ClockTime = 0
-            OrionLib:MakeNotification({
-                Name = "Night Vision",
-                Content = "🌙 Night Vision Activated!",
-                Time = 3
-            })
-        else
-            Lighting.Ambient = Color3.new(0, 0, 0)
-            Lighting.Brightness = 1
-            Lighting.ClockTime = 14
-        end
-    end
-})
-
--- Full Bright
-local fullBrightEnabled = false
-VisualTab:AddToggle({
-    Name = "☀️ Full Bright",
-    Default = false,
-    Callback = function(v)
-        fullBrightEnabled = v
-        if v then
-            Lighting.GlobalShadows = false
-            Lighting.Brightness = 3
-            OrionLib:MakeNotification({
-                Name = "Full Bright",
-                Content = "☀️ Full Bright Activated!",
-                Time = 3
-            })
-        else
-            Lighting.GlobalShadows = true
-            Lighting.Brightness = 1
-        end
-    end
-})
-
--- Chams (See players through walls)
-local chamsEnabled = false
-local chamParts = {}
-VisualTab:AddToggle({
-    Name = "👁️ Player Chams",
-    Default = false,
-    Callback = function(v)
-        chamsEnabled = v
-        if v then
-            for _, player in ipairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character then
-                    for _, part in ipairs(player.Character:GetDescendants()) do
-                        if part:IsA("BasePart") then
-                            local highlight = Instance.new("Highlight")
-                            highlight.FillColor = Color3.new(1, 0, 0)
-                            highlight.OutlineColor = Color3.new(1, 1, 0)
-                            highlight.FillTransparency = 0.5
-                            highlight.OutlineTransparency = 0
-                            highlight.Parent = part
-                            chamParts[part] = highlight
-                        end
-                    end
-                end
-            end
-        else
-            for part, highlight in pairs(chamParts) do
-                highlight:Destroy()
-            end
-            chamParts = {}
-        end
-    end
-})
-
--- ===========================
-## SETTINGS TAB
--- ===========================
-local SettingsTab = Window:MakeTab({ Name = "⚙️│Settings", Icon = "rbxassetid://3926307971" })
-
-SettingsTab:AddSection({ Name = "🔧 Script Settings" })
-
--- UI Toggle Keybind
-SettingsTab:AddBind({
-    Name = "🔘 Toggle UI",
-    Default = Enum.KeyCode.RightShift,
-    Hold = false,
-    Callback = function()
-        OrionLib:ToggleUI()
-    end
-})
-
--- Destroy UI
-SettingsTab:AddButton({
-    Name = "🗑️ Destroy UI",
-    Callback = function()
-        OrionLib:Destroy()
-        OrionLib:MakeNotification({
-            Name = "UI Destroyed",
-            Content = "UI has been destroyed. Re-execute to show again.",
+        setclipboard("https://discord.gg/MNEv7h9yWU")
+        Material.Banner({
+            Text = "Discord Link kopiert!",
             Time = 3
         })
     end
 })
 
--- Save Settings
-SettingsTab:AddButton({
-    Name = "💾 Save Settings",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "Settings",
-            Content = "💾 Settings saved successfully!",
-            Time = 3
-        })
-    end
-})
-
--- Reset Settings
-SettingsTab:AddButton({
-    Name = "🔄 Reset Settings",
-    Callback = function()
-        OrionLib:MakeNotification({
-            Name = "Settings",
-            Content = "🔄 Settings have been reset!",
-            Time = 3
-        })
-    end
-})
-
-SettingsTab:AddSection({ Name = "📊 Performance" })
-
--- FPS Counter
-local fpsCounterEnabled = false
-local fpsText
-SettingsTab:AddToggle({
-    Name = "📊 Show FPS",
-    Default = false,
-    Callback = function(v)
-        fpsCounterEnabled = v
-        if v then
-            fpsText = Drawing.new("Text")
-            fpsText.Visible = true
-            fpsText.Color = Color3.new(1, 1, 1)
-            fpsText.Size = 18
-            fpsText.Outline = true
-            fpsText.Position = Vector2.new(10, 10)
-            
-            spawn(function()
-                while fpsCounterEnabled do
-                    fpsText.Text = "FPS: " .. math.floor(1/RunService.RenderStepped:Wait())
-                    task.wait(0.1)
-                end
-                fpsText:Remove()
-            end)
-        end
-    end
+CreditsTab.Label({
+    Text = "Made with ❤️ by Samuel"
 })
 
 -- ===========================
-## INITIALIZE
+-- CLEANUP
 -- ===========================
-OrionLib:Init()
+game:GetService("UserInputService").WindowFocused:Connect(function()
+    -- Keep scripts running
+end)
 
--- Startup notification
-task.wait(1)
-OrionLib:MakeNotification({
-    Name = "Samuel Scripts",
-    Content = "✨ Premium Edition Loaded Successfully!",
-    Image = "rbxassetid://4483345998",
-    Time = 5
-})
+game:GetService("UserInputService").WindowFocusReleased:Connect(function()
+    -- Optional: Pause heavy operations
+end)
 
--- Auto-update player list for teleport
-while true do
-    updatePlayerList()
-    task.wait(5)
-end
+LocalPlayer.CharacterAdded:Connect(function()
+    -- Reinitialize connections
+end)
